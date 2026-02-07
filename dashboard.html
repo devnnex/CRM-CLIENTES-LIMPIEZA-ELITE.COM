@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Limpieza Elite CRM</title>
+
+ <!-- FONTAWESOME CDN -->
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+<!-- 🧩 Favicon clásico -->
+  <link rel="icon" type="image/png" href="./images/favicon.png">
+
+  <!-- 📱 Ícono de app (iOS / Android) -->
+  <link rel="apple-touch-icon" href="./images/favicon.png">
+
+  <!-- 🧭 Configuración PWA -->
+  <meta name="theme-color" content="#000000">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Admin Limpieza Elite">
+
+  <!-- 📜 Manifest -->
+  <link rel="manifest" href="./manifest.json">
+
+<style>
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+:root{
+ --bg: radial-gradient(circle at 20% 20%, #0a0f25, #050814 70%);
+ --glass: rgba(255,255,255,0.08);
+ --glass-strong: rgba(255,255,255,0.14);
+ --border: rgba(255,255,255,0.18);
+ --accent:#4cc9f0;
+ --accent-soft:rgba(76,201,240,.25);
+ --radius:20px;
+ --text:#e9f0ff;
+ --shadow:0 20px 60px rgba(0,0,0,.5);
+ font-family: Inter,system-ui;
+}
+
+*{box-sizing:border-box}
+
+body{
+ margin:0;
+ background:var(--bg);
+ color:var(--text);
+ display:flex;
+ min-height:100vh;
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+.sidebar{
+ width:260px;
+ padding:28px;
+ background:var(--glass);
+ backdrop-filter:blur(20px);
+ border-right:1px solid var(--border);
+}
+
+.sidebar{
+ width:260px;
+ padding:28px;
+ background:var(--glass);
+ backdrop-filter:blur(20px);
+ border-right:1px solid var(--border);
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ gap:16px;
+}
+
+.logo{
+ width:100%;
+ max-width:160px;
+ border-radius:16px;
+ box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+.main{
+ flex:1;
+ padding:28px;
+ display:flex;
+ flex-direction:column;
+ gap:24px;
+}
+
+.topbar{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+}
+
+.btn{
+ background:linear-gradient(135deg,#4cc9f0,#4361ee);
+ border:none;
+ padding:14px 22px;
+ border-radius:14px;
+ color:white;
+ font-weight:600;
+ cursor:pointer;
+ box-shadow:0 0 24px rgba(76,201,240,.4);
+}
+
+/* =========================================================
+   KPIS
+========================================================= */
+.kpis{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+ gap:16px;
+}
+
+.kpi{
+ padding:22px;
+ border-radius:var(--radius);
+ background:var(--glass);
+ border:1px solid var(--border);
+ box-shadow:var(--shadow);
+}
+
+.kpi span{opacity:.7;font-size:13px}
+.kpi h2{margin:6px 0 0;font-size:28px}
+
+/* =========================================================
+   FILTERS
+========================================================= */
+.filters{
+ display:flex;
+ gap:12px;
+ padding:16px;
+ background:var(--glass);
+ border:1px solid var(--border);
+ border-radius:var(--radius);
+}
+
+.filters input,.filters select{
+ padding:12px;
+ border-radius:12px;
+ border:1px solid var(--border);
+ background:#0005;
+ color:white;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+.table-wrap{
+ background:var(--glass);
+ border-radius:var(--radius);
+ overflow-x:auto;   /* importante */
+ border:1px solid var(--border);
+}
+
+table{width:100%;border-collapse:collapse}
+th,td{padding:16px;border-bottom:1px solid #ffffff15}
+th{opacity:.7;font-size:13px}
+
+tr:hover td{background:rgba(76,201,240,.08)}
+
+tr.soon td{background:rgba(255,209,102,.12)}
+tr.expired td{background:rgba(255,107,107,.12)}
+
+.soon{color:#ffd166;font-weight:600}
+.expired{color:#ff6b6b;font-weight:700}
+
+/* =========================================================
+   BOTON RECORDAR
+========================================================= */
+.remind{
+ background:#a48a4d;
+ color:#08223f;
+ padding: 3px 9px;
+ border-radius:10px;
+ font-weight:700;
+ text-decoration:none;
+}
+.remind:hover{
+ background:#08223f;
+ color:#ffd166;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+.modal{
+ display:none;
+ position:fixed;
+ inset:0;
+ background:#0008;
+ backdrop-filter:blur(8px);
+ align-items:center;
+ justify-content:center;
+}
+
+.modal-box{
+ background:#0d122b;
+ padding:30px;
+ border-radius:20px;
+ display:flex;
+ flex-direction:column;
+ gap:12px;
+ width:340px;
+ box-shadow:var(--shadow);
+}
+
+.modal-box input{
+ padding:12px;
+ border-radius:12px;
+ border:1px solid var(--border);
+ background:#0005;
+ color:white;
+}
+
+
+.status-dot{
+ display:inline-block;
+ width:10px;
+ height:10px;
+ border-radius:50%;
+ margin-right:8px;
+ box-shadow:0 0 10px currentColor,0 0 18px currentColor;
+}
+
+.dot-active{color:#39ff14}
+.dot-soon{color:#ffb703}
+.dot-expired{color:#ff006e}
+
+.action-btn{
+ border:none;
+ padding:8px 10px;
+ border-radius:8px;
+ cursor:pointer;
+ margin-left:4px;
+}
+.edit-btn{background:#4cc9f0;color:#001;padding: 3px 9px;border-radius: 10px;margin-top: 10px;}
+.del-btn{background:#ff4d6d;color:white;padding: 3px 9px;border-radius: 10px;margin-top: 10px;}
+
+
+/* =========================================================
+   LOADERS
+========================================================= */
+.loader{
+ position:fixed;
+ inset:0;
+ display:none;
+ align-items:center;
+ justify-content:center;
+ background:#0007;
+ backdrop-filter:blur(6px);
+ z-index:999;
+}
+
+.spinner{
+ width:42px;
+ height:42px;
+ border-radius:50%;
+ border:4px solid rgba(76,201,240,.25);
+ border-top-color:#4cc9f0;
+ animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+footer{
+ text-align:center;
+ opacity:.6;
+ margin-top:auto;
+ font-size:13px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width:1000px){
+
+ body{
+  flex-direction:column;
+ }
+
+ .sidebar{
+  width:100%;
+  flex-direction:row;
+  justify-content:space-between;
+  border-right:none;
+  border-bottom:1px solid var(--border);
+ }
+
+ .logo{
+  max-width:110px;
+ }
+
+ .main{
+  padding:20px;
+ }
+
+ .topbar{
+  flex-direction:column;
+  align-items:flex-start;
+  gap:12px;
+ }
+
+ .filters{
+  flex-direction:column;
+ }
+
+}
+
+@media (max-width:600px){
+
+ th,td{
+  padding:10px;
+  font-size:13px;
+ }
+
+ .kpis{
+  grid-template-columns:1fr;
+ }
+
+ .btn{
+  width:100%;
+ }
+
+}
+
+
+</style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+<h2>Limpieza Elite</h2>
+<img src="images/logo.png" class="logo">
+</aside>
+
+
+<main class="main">
+
+<div class="topbar">
+<h1>CRM de Servicios</h1>
+<button class="btn" onclick="openModal()">+ Nuevo Cliente</button>
+</div>
+
+<section class="kpis">
+<div class="kpi"><span>Total</span><h2 id="kTotal">0</h2></div>
+<div class="kpi"><span>Por vencer</span><h2 id="kSoon">0</h2></div>
+<div class="kpi"><span>Vencidos</span><h2 id="kExpired">0</h2></div>
+<div class="kpi"><span>7 días</span><h2 id="kRecent">0</h2></div>
+</section>
+
+<section class="filters">
+<input id="search" placeholder="Buscar cliente o cualquier dato">
+<select id="filterCity"><option value="">Todas ciudades</option></select>
+<select id="filterState">
+<option value="">Todos</option>
+<option value="soon">Por vencer</option>
+<option value="expired">Vencidos</option>
+</select>
+</section>
+
+<section class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Nombre</th>
+<th>Teléfono</th>
+<th>Ciudad</th>
+<th>Servicio</th>
+<th>Frecuencia</th>
+<th>Valor</th>
+<th>Expiración</th>
+<th>Estado</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+</section>
+
+<footer id="footer"></footer>
+
+</main>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+<div class="modal-box">
+<input id="mNombre" placeholder="Nombre">
+<input id="mTelefono" placeholder="Teléfono">
+<input id="mCiudad" placeholder="Ciudad">
+<input id="mServicio" placeholder="Servicio">
+<input id="mFrecuencia" type="number" placeholder="Frecuencia meses">
+<input id="mValor" type="number" placeholder="Valor">
+<button class="btn" onclick="save()">Guardar</button>
+</div>
+</div>
+
+<!-- LOADERS -->
+<div id="loaderLoad" class="loader"><div class="spinner"></div></div>
+<div id="loaderSave" class="loader"><div class="spinner"></div></div>
+<div id="loaderDelete" class="loader"><div class="spinner"></div></div>
+
+<script>
+
+/* =========================================================
+   CONFIG
+========================================================= */
+const API="https://script.google.com/macros/s/AKfycbyxzrgkxJLz9UCNAZDubBWXTuH_Es-TmvKS5MD29AP9b8e3v2yARM40M2hwf14urob_sg/exec";
+let data=[];
+let editingId=null;
+let lastCount=0;
+
+/* =========================================================
+   UTILIDADES
+========================================================= */
+const daysDiff=d=>Math.ceil((new Date(d)-new Date())/86400000);
+
+const statusInfo=exp=>{
+ const d=daysDiff(exp);
+ if(d<=0) return {t:"Vencido",cls:"expired"};
+ if(d<=7) return {t:`Por vencer (${d}d)`,cls:"soon"};
+ return {t:"Activo",cls:""};
+};
+
+/* =========================================================
+   FOOTER
+========================================================= */
+function updateFooter() {
+  const year = new Date().getFullYear();
+  footer.textContent = `© ${year} Limpieza Elite. Todos los derechos reservados.`;
+}
+
+
+/* =========================================================
+   CIUDADES DINAMICAS
+========================================================= */
+function buildCities(){
+ const set=new Set(data.map(x=>x.ciudad));
+ filterCity.innerHTML='<option value="">Todas ciudades</option>';
+ set.forEach(c=>{
+  filterCity.innerHTML+=`<option>${c}</option>`;
+ });
+}
+
+/* =========================================================
+   LOAD
+========================================================= */
+async function load(showLoader=true){
+
+ if(showLoader) loaderLoad.style.display="flex";
+
+ const r=await fetch(API+"?action=list");
+ const newData=await r.json();
+
+ if(showLoader) loaderLoad.style.display="none";
+
+ // solo re-render si cambió la cantidad
+ if(newData.length !== data.length){
+   data=newData;
+   buildCities();
+   updateFooter();
+   render();
+ }
+
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+function render(){
+
+ const q=search.value.toLowerCase();
+ const city=filterCity.value;
+ const stf=filterState.value;
+
+ tbody.innerHTML="";
+ let soon=0,exp=0,recent=0;
+ const now=Date.now();
+
+ data.forEach(c=>{
+
+  const st=statusInfo(c.expiracion);
+
+  if(q && !Object.values(c).join(" ").toLowerCase().includes(q)) return;
+  if(city && c.ciudad!==city) return;
+  if(stf && st.cls!==stf) return;
+
+  if(st.cls==="soon")soon++;
+  if(st.cls==="expired")exp++;
+  if(now-new Date(c.fecha)<7*86400000)recent++;
+
+  const msg=`Hola ${c.nombre}, esperamos que estés muy bien 😊 Tenemos una promoción especial disponible para tu servicio de limpieza. ¿Te gustaría agendar nuevamente esta semana?`;
+
+  let dotClass="dot-active";
+if(st.cls==="soon") dotClass="dot-soon";
+if(st.cls==="expired") dotClass="dot-expired";
+
+tbody.innerHTML+=`
+<tr class="${st.cls}">
+ <td>
+   <span class="status-dot ${dotClass}"></span>
+   ${c.nombre}
+ </td>
+ <td>${c.telefono}</td>
+ <td>${c.ciudad}</td>
+ <td>${c.servicio}</td>
+ <td>${c.frecuencia} meses</td>
+ <td>$${Number(c.valor).toLocaleString()}</td>
+ <td>${c.expiracion.split("T")[0]}</td>
+ <td class="${st.cls}">${st.t}</td>
+ <td>
+
+   <a class="remind" target="_blank"
+   href="https://wa.me/57${c.telefono}?text=${encodeURIComponent(msg)}">
+   🔔
+   </a>
+
+   <button class="action-btn edit-btn" onclick="edit('${c.id}')">🗑️ </button>
+   <button class="action-btn del-btn" onclick="remove('${c.id}')">🖊️</button>
+
+ </td>
+</tr>`;
+ });
+
+ kTotal.textContent=data.length;
+ kSoon.textContent=soon;
+ kExpired.textContent=exp;
+ kRecent.textContent=recent;
+}
+
+/* =========================================================
+   SAVE / CREATE / UPDATE & DELETE
+========================================================= */
+async function save(){
+
+ loaderSave.style.display="flex";
+
+ const now=new Date();
+ const exp=new Date(now);
+ exp.setMonth(exp.getMonth()+Number(mFrecuencia.value));
+
+ const payload={
+ action: editingId?"update":"create",
+ id: editingId,
+ nombre:mNombre.value,
+ telefono:mTelefono.value,
+ ciudad:mCiudad.value,
+ servicio:mServicio.value,
+ frecuencia:mFrecuencia.value,
+ valor:mValor.value,
+ fecha:now.toISOString(),
+ contactoMes:now.toISOString().slice(0,7),
+ expiracion:exp.toISOString()
+ };
+
+ await fetch(API,{
+  method:"POST",
+  body:JSON.stringify(payload)
+ });
+
+ loaderSave.style.display="none";
+ modal.style.display="none";
+ editingId=null;
+ load();
+}
+
+
+
+function edit(id){
+ const c=data.find(x=>x.id==id);
+ editingId=id;
+ mNombre.value=c.nombre;
+ mTelefono.value=c.telefono;
+ mCiudad.value=c.ciudad;
+ mServicio.value=c.servicio;
+ mFrecuencia.value=c.frecuencia;
+ mValor.value=c.valor;
+ modal.style.display="flex";
+}
+
+async function remove(id){
+
+ if(!confirm("Eliminar cliente?")) return;
+
+ loaderDelete.style.display="flex";
+
+ await fetch(API,{
+   method:"POST",
+   body:JSON.stringify({action:"delete",id})
+ });
+
+ loaderDelete.style.display="none";
+ load();
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+function openModal(){
+ editingId=null;
+ modal.style.display="flex";
+}
+
+modal.onclick=e=>e.target===modal&&(modal.style.display="none");
+
+/* =========================================================
+   EVENTS
+========================================================= */
+search.oninput=filterCity.onchange=filterState.onchange=render;
+
+/* =========================================================
+   INIT
+========================================================= */
+load();
+setInterval(()=>load(false),120000);
+
+
+</script>
+</body>
+</html>
