@@ -83,6 +83,14 @@ body{
  box-shadow:0 10px 30px rgba(0,0,0,.4);
 }
 
+.sidebar-assistant{
+ width:100%;
+ margin-top:auto;
+ display:flex;
+ flex-direction:column;
+ gap:12px;
+}
+
 
 /* =========================================================
    MAIN
@@ -179,9 +187,11 @@ tr.expired td{background:rgba(255,107,107,.12)}
 ========================================================= */
 .remind{
  background:#a48a4d;
+ border:none;
  color:#08223f;
  padding: 3px 9px;
  border-radius:10px;
+ cursor:pointer;
  font-weight:700;
  text-decoration:none;
 }
@@ -214,12 +224,160 @@ tr.expired td{background:rgba(255,107,107,.12)}
  box-shadow:var(--shadow);
 }
 
+.modal-wide{
+ width:min(760px,92vw);
+}
+
+.modal-header{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:12px;
+}
+
+.modal-header h3{
+ margin:0;
+}
+
+.close-x{
+ width:38px;
+ height:38px;
+ border-radius:50%;
+ border:1px solid var(--border);
+ background:transparent;
+ color:var(--text);
+ cursor:pointer;
+ font-size:20px;
+ line-height:1;
+}
+
 .modal-box input{
  padding:12px;
  border-radius:12px;
  border:1px solid var(--border);
  background:#0005;
  color:white;
+}
+
+.modal-box select,
+.modal-box textarea{
+ padding:12px;
+ border-radius:12px;
+ border:1px solid var(--border);
+ background:#0005;
+ color:white;
+ font:inherit;
+}
+
+.modal-box textarea{
+ min-height:140px;
+ resize:vertical;
+}
+
+.modal-actions{
+ display:flex;
+ gap:10px;
+}
+
+.modal-actions .btn{
+ flex:1;
+}
+
+.btn-secondary{
+ background:transparent;
+ border:1px solid var(--border);
+ box-shadow:none;
+}
+
+.input-error{
+ border-color:#ff6b6b !important;
+ box-shadow:0 0 0 1px rgba(255,107,107,.25);
+}
+
+.form-error{
+ display:none;
+ color:#ff9aa2;
+ font-size:13px;
+}
+
+.assistant-box{
+ background:var(--glass);
+ border:1px solid var(--border);
+ border-radius:var(--radius);
+ box-shadow:var(--shadow);
+ padding:18px;
+}
+
+.assistant-box h3{
+ margin:0 0 8px;
+}
+
+.assistant-box p{
+ margin:0 0 14px;
+ opacity:.78;
+ font-size:14px;
+}
+
+.chat-log{
+ display:flex;
+ flex-direction:column;
+ gap:10px;
+ max-height:260px;
+ overflow:auto;
+ padding-right:4px;
+}
+
+.chat-msg{
+ padding:12px 14px;
+ border-radius:16px;
+ line-height:1.45;
+ white-space:pre-wrap;
+}
+
+.chat-user{
+ align-self:flex-end;
+ background:linear-gradient(135deg,#4cc9f0,#4361ee);
+ color:white;
+ max-width:85%;
+}
+
+.chat-bot{
+ align-self:flex-start;
+ background:#091126;
+ border:1px solid rgba(255,255,255,.1);
+ max-width:100%;
+}
+
+.chat-form{
+ display:flex;
+ flex-direction:column;
+ gap:10px;
+ margin-top:14px;
+}
+
+.chat-form input{
+ flex:1;
+ padding:12px;
+ border-radius:12px;
+ border:1px solid var(--border);
+ background:#0005;
+ color:white;
+}
+
+.chat-tips{
+ display:grid;
+ grid-template-columns:1fr;
+ gap:8px;
+}
+
+.tip-btn{
+ border:1px solid var(--border);
+ background:#0004;
+ color:var(--text);
+ border-radius:12px;
+ padding:10px 12px;
+ cursor:pointer;
+ text-align:left;
 }
 
 
@@ -290,10 +448,14 @@ footer{
 
  .sidebar{
   width:100%;
-  flex-direction:row;
-  justify-content:space-between;
+  flex-direction:column;
+  justify-content:flex-start;
   border-right:none;
   border-bottom:1px solid var(--border);
+ }
+
+ .sidebar-assistant{
+  margin-top:0;
  }
 
  .logo{
@@ -342,6 +504,28 @@ footer{
 <aside class="sidebar">
 <h2>Limpieza Elite</h2>
 <img src="images/logo.png" class="logo">
+<section class="sidebar-assistant">
+<div class="assistant-box">
+<h3>Asistente CRM</h3>
+<p>Haz preguntas sobre clientes, servicios, ciudades, vencimientos o actividad reciente y el sistema respondera usando la informacion del CRM.</p>
+<div id="chatLog" class="chat-log"></div>
+<form class="chat-form" onsubmit="askAssistant(event)">
+<input id="chatInput" placeholder="Ejemplo: cuantos clientes vencidos hay en Bogota">
+<button class="btn" type="submit">Preguntar</button>
+</form>
+</div>
+<div class="assistant-box">
+<h3>Preguntas sugeridas</h3>
+<div class="chat-tips">
+<button class="tip-btn" type="button" onclick="fillChatQuestion('Cuantos clientes hay en total?')">Clientes totales</button>
+<button class="tip-btn" type="button" onclick="fillChatQuestion('Que servicios son los mas frecuentes?')">Servicios frecuentes</button>
+<button class="tip-btn" type="button" onclick="fillChatQuestion('Cuantos clientes estan por vencer?')">Por vencer</button>
+<button class="tip-btn" type="button" onclick="fillChatQuestion('Cuantos clientes vencidos hay?')">Vencidos</button>
+<button class="tip-btn" type="button" onclick="fillChatQuestion('Que clientes hay en Bogota?')">Clientes por ciudad</button>
+<button class="tip-btn" type="button" onclick="fillChatQuestion('Busca el cliente Carlos')">Buscar cliente</button>
+</div>
+</div>
+</section>
 </aside>
 
 
@@ -395,13 +579,39 @@ footer{
 <!-- MODAL -->
 <div class="modal" id="modal">
 <div class="modal-box">
+<div class="modal-header">
+<h3>Nuevo registro</h3>
+<button class="close-x" type="button" onclick="closeFormModal()" aria-label="Cerrar">X</button>
+</div>
 <input id="mNombre" placeholder="Nombre">
 <input id="mTelefono" placeholder="Teléfono">
 <input id="mCiudad" placeholder="Ciudad">
 <input id="mServicio" placeholder="Servicio">
 <input id="mFrecuencia" type="number" placeholder="Frecuencia meses">
 <input id="mValor" type="number" placeholder="Valor">
+<div id="formError" class="form-error">Completa todos los campos antes de guardar.</div>
 <button class="btn" onclick="save()">Guardar</button>
+</div>
+</div>
+
+<div class="modal" id="notifyModal">
+<div class="modal-box modal-wide">
+<div class="modal-header">
+<h3>Notificar cliente</h3>
+<button class="close-x" type="button" onclick="closeNotifyModal()" aria-label="Cerrar">X</button>
+</div>
+<input id="notifyClientName" placeholder="Cliente" readonly>
+<input id="notifyServiceName" placeholder="Servicio" readonly>
+<select id="notifyType">
+<option value="recordatorio">Recordatorio de mantenimiento</option>
+<option value="seguimiento">Seguimiento post servicio</option>
+<option value="promocion">Promocion para repetir servicio</option>
+</select>
+<textarea id="notifyPreview" placeholder="Vista previa del mensaje"></textarea>
+<div class="modal-actions">
+<button class="btn btn-secondary" type="button" onclick="closeNotifyModal()">Cerrar</button>
+<button class="btn" type="button" onclick="sendWhatsAppNotification()">Enviar por WhatsApp</button>
+</div>
 </div>
 </div>
 
@@ -419,6 +629,8 @@ const API="https://script.google.com/macros/s/AKfycbyxzrgkxJLz9UCNAZDubBWXTuH_Es
 let data=[];
 let editingId=null;
 let lastCount=0;
+let notifyingClientId=null;
+let chatBootstrapped=false;
 
 /* =========================================================
    UTILIDADES
@@ -431,6 +643,257 @@ const statusInfo=exp=>{
  if(d<=7) return {t:`Por vencer (${d}d)`,cls:"soon"};
  return {t:"Activo",cls:""};
 };
+
+function normalizeText(value=""){
+ return value
+  .toString()
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g,"")
+  .toLowerCase()
+  .trim();
+}
+
+function formatMoney(value){
+ return `$${Number(value || 0).toLocaleString()}`;
+}
+
+function describeService(servicio=""){
+ const base=servicio.toString().trim() || "servicio de limpieza";
+ const normalized=normalizeText(base);
+
+ if(normalized.includes("sofa")) return `la limpieza de tu sofa (${base})`;
+ if(normalized.includes("colchon")) return `la limpieza de tu colchon (${base})`;
+ if(normalized.includes("tapete") || normalized.includes("alfombra")) return `la limpieza de tu tapete (${base})`;
+ if(normalized.includes("silla") || normalized.includes("comedor")) return `la limpieza de tus sillas (${base})`;
+ if(normalized.includes("cortina")) return `la limpieza de tus cortinas (${base})`;
+ if(normalized.includes("auto") || normalized.includes("vehiculo") || normalized.includes("carro")) return `la limpieza de tu vehiculo (${base})`;
+ if(normalized.includes("mueble") || normalized.includes("poltrona")) return `la limpieza de tus muebles (${base})`;
+
+ return `tu servicio de ${base}`;
+}
+
+function getReminderTarget(servicio=""){
+ const base=servicio.toString().trim() || "tus muebles";
+ const normalized=normalizeText(base);
+
+ if(normalized.includes("sofa")) return "tu sofa";
+ if(normalized.includes("colchon")) return "tu colchon";
+ if(normalized.includes("tapete") || normalized.includes("alfombra")) return "tu tapete";
+ if(normalized.includes("silla") || normalized.includes("comedor")) return "tus sillas";
+ if(normalized.includes("cortina")) return "tus cortinas";
+ if(normalized.includes("auto") || normalized.includes("vehiculo") || normalized.includes("carro")) return "tu vehiculo";
+ if(normalized.includes("mueble") || normalized.includes("poltrona")) return "tus muebles";
+
+ return `tu servicio de ${base}`;
+}
+
+const messageTemplates={
+ recordatorio:(c,serviceText)=>`Hola ${c.nombre}, muy buen dia 😊
+
+Queríamos recordarte que hace aproximadamente 6 meses realizamos ${serviceText}.
+
+Para mantener ${getReminderTarget(c.servicio)} en optimas condiciones, libres de acaros, bacterias y suciedad acumulada, se recomienda realizar este proceso cada 6 meses.
+
+Nos encantaria ayudarte a dejar ${getReminderTarget(c.servicio)} nuevamente como ${getReminderTarget(c.servicio).includes("tus ") ? "nuevos" : "nuevo"} ✨
+En este momento contamos con disponibilidad para agendar tu servicio en los proximos dias.
+
+Si deseas, podemos reservarte un espacio de inmediato y adaptarnos al horario que mejor te funcione.
+
+Quedamos muy atentos a tu confirmacion.
+
+Limpieza Elite 🧼`,
+ seguimiento:(c,serviceText)=>`Hola ${c.nombre}, queremos saber como te fue con ${serviceText}. Si notas alguna necesidad adicional o quieres agendar otro servicio, con gusto te ayudamos.`,
+ promocion:(c,serviceText)=>`Hola ${c.nombre}, tenemos una promocion especial para ${serviceText}. Si quieres aprovecharla y dejar todo impecable nuevamente, escribenos y te ayudamos a agendar.`
+};
+
+function buildWhatsAppMessage(client,type){
+ const serviceText=describeService(client.servicio);
+ const template=messageTemplates[type] || messageTemplates.recordatorio;
+ return template(client,serviceText);
+}
+
+function updateNotifyPreview(){
+ const client=data.find(x=>x.id==notifyingClientId);
+ if(!client) return;
+ notifyPreview.value=buildWhatsAppMessage(client,notifyType.value);
+}
+
+function openNotifyModal(id){
+ const client=data.find(x=>x.id==id);
+ if(!client) return;
+
+ notifyingClientId=id;
+ notifyClientName.value=client.nombre;
+ notifyServiceName.value=client.servicio;
+ notifyType.value="recordatorio";
+ updateNotifyPreview();
+ notifyModal.style.display="flex";
+}
+
+function closeNotifyModal(){
+ notifyModal.style.display="none";
+ notifyingClientId=null;
+}
+
+function sendWhatsAppNotification(){
+ const client=data.find(x=>x.id==notifyingClientId);
+ if(!client) return;
+
+ let phone=String(client.telefono || "").replace(/\D/g,"");
+ const msg=notifyPreview.value.trim();
+
+ if(phone.length===10) phone=`57${phone}`;
+
+ if(!phone || !msg) return;
+
+ window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,"_blank");
+ closeNotifyModal();
+}
+
+function appendChatMessage(role,text){
+ const item=document.createElement("div");
+ item.className=`chat-msg ${role==="user"?"chat-user":"chat-bot"}`;
+ item.textContent=text;
+ chatLog.appendChild(item);
+ chatLog.scrollTop=chatLog.scrollHeight;
+}
+
+function fillChatQuestion(question){
+ chatInput.value=question;
+ chatInput.focus();
+}
+
+function getTopServices(limit=3){
+ const map={};
+ data.forEach(c=>{
+  const key=(c.servicio || "Sin servicio").trim();
+  map[key]=(map[key] || 0)+1;
+ });
+ return Object.entries(map)
+  .sort((a,b)=>b[1]-a[1])
+  .slice(0,limit);
+}
+
+function getClientsByStatus(targetStatus){
+ return data.filter(c=>statusInfo(c.expiracion).cls===targetStatus);
+}
+
+function extractCityFromQuestion(question){
+ const normalizedQuestion=normalizeText(question);
+ const match=data
+  .map(c=>c.ciudad)
+  .filter(Boolean)
+  .find(city=>normalizedQuestion.includes(normalizeText(city)));
+ return match || "";
+}
+
+function answerByClientSearch(question){
+ const normalizedQuestion=normalizeText(question)
+  .replace("busca el cliente","")
+  .replace("buscar cliente","")
+  .replace("cliente","")
+  .trim();
+
+ if(!normalizedQuestion) return "Dime el nombre del cliente que quieres buscar. Por ejemplo: busca el cliente Carlos.";
+
+ const matches=data.filter(c=>normalizeText(c.nombre).includes(normalizedQuestion));
+ if(!matches.length) return `No encontre clientes que coincidan con "${normalizedQuestion}".`;
+
+ return matches.slice(0,5).map(c=>{
+  const st=statusInfo(c.expiracion);
+  return `${c.nombre} | ${c.ciudad} | ${c.servicio} | ${st.t} | ${formatMoney(c.valor)}`;
+ }).join("\n");
+}
+
+function generateAssistantReply(question){
+ const q=normalizeText(question);
+ if(!data.length) return "Todavia no hay datos cargados en el CRM para responder.";
+
+ const city=extractCityFromQuestion(question);
+
+ if(q.includes("total") || q.includes("cuantos clientes hay")){
+  return `Actualmente hay ${data.length} clientes registrados en el CRM.`;
+ }
+
+ if(q.includes("por vencer")){
+  const soonClients=getClientsByStatus("soon");
+  if(city){
+   const filtered=soonClients.filter(c=>c.ciudad===city);
+   return `Hay ${filtered.length} clientes por vencer en ${city}${filtered.length?`: ${filtered.map(c=>c.nombre).join(", ")}`:"."}`;
+  }
+  return `Hay ${soonClients.length} clientes por vencer${soonClients.length?`: ${soonClients.slice(0,6).map(c=>c.nombre).join(", ")}`:"."}`;
+ }
+
+ if(q.includes("vencido")){
+  const expiredClients=getClientsByStatus("expired");
+  if(city){
+   const filtered=expiredClients.filter(c=>c.ciudad===city);
+   return `Hay ${filtered.length} clientes vencidos en ${city}${filtered.length?`: ${filtered.map(c=>c.nombre).join(", ")}`:"."}`;
+  }
+  return `Hay ${expiredClients.length} clientes vencidos${expiredClients.length?`: ${expiredClients.slice(0,6).map(c=>c.nombre).join(", ")}`:"."}`;
+ }
+
+ if(q.includes("servicio") || q.includes("servicios")){
+  const top=getTopServices();
+  if(!top.length) return "No hay servicios suficientes para analizar.";
+  return `Los servicios mas frecuentes son: ${top.map(([name,count])=>`${name} (${count})`).join(", ")}.`;
+ }
+
+ if(q.includes("ciudad") || q.includes("bogota") || q.includes("medellin") || q.includes("cali") || q.includes("clientes hay en")){
+  if(city){
+   const matches=data.filter(c=>c.ciudad===city);
+   return `En ${city} hay ${matches.length} clientes${matches.length?`: ${matches.slice(0,8).map(c=>c.nombre).join(", ")}`:"."}`;
+  }
+
+  const totals={};
+  data.forEach(c=>{
+   totals[c.ciudad]=(totals[c.ciudad] || 0)+1;
+  });
+  return `Distribucion por ciudad: ${Object.entries(totals).sort((a,b)=>b[1]-a[1]).map(([name,count])=>`${name} (${count})`).join(", ")}.`;
+ }
+
+ if(q.includes("reciente") || q.includes("7 dias") || q.includes("ultimos servicios")){
+  const recentClients=data.filter(c=>Date.now()-new Date(c.fecha)<7*86400000);
+  return `En los ultimos 7 dias hay ${recentClients.length} registros${recentClients.length?`: ${recentClients.slice(0,6).map(c=>c.nombre).join(", ")}`:"."}`;
+ }
+
+ if(q.includes("valor") || q.includes("ingreso")){
+  const total=data.reduce((sum,c)=>sum+Number(c.valor || 0),0);
+  return `El valor acumulado de los registros es ${formatMoney(total)}.`;
+ }
+
+ if(q.includes("cliente") || q.includes("busca")){
+  return answerByClientSearch(question);
+ }
+
+ return [
+  "Puedo ayudarte con preguntas como:",
+  "- cuantos clientes hay",
+  "- cuantos estan por vencer",
+  "- cuantos estan vencidos",
+  "- que servicios son los mas frecuentes",
+  "- que clientes hay en una ciudad",
+  "- busca el cliente nombre"
+ ].join("\n");
+}
+
+function askAssistant(event){
+ if(event) event.preventDefault();
+ const question=chatInput.value.trim();
+ if(!question) return;
+
+ appendChatMessage("user",question);
+ chatInput.value="";
+
+ const answer=generateAssistantReply(question);
+ setTimeout(()=>appendChatMessage("bot",answer),180);
+}
+
+function bootstrapAssistant(){
+ if(chatBootstrapped) return;
+ chatBootstrapped=true;
+ appendChatMessage("bot","Estoy listo para ayudarte con preguntas sobre clientes, servicios, ciudades, vencimientos, valores y actividad reciente del CRM.");
+}
 
 /* =========================================================
    FOOTER
@@ -465,12 +928,10 @@ async function load(showLoader=true){
  if(showLoader) loaderLoad.style.display="none";
 
  // solo re-render si cambió la cantidad
- if(newData.length !== data.length){
-   data=newData;
-   buildCities();
-   updateFooter();
-   render();
- }
+ data=newData;
+ buildCities();
+ updateFooter();
+ render();
 
 }
 
@@ -500,8 +961,6 @@ function render(){
   if(st.cls==="expired")exp++;
   if(now-new Date(c.fecha)<7*86400000)recent++;
 
-  const msg=`Hola ${c.nombre}, esperamos que estés muy bien 😊 Tenemos una promoción especial disponible para tu servicio de limpieza. ¿Te gustaría agendar nuevamente esta semana?`;
-
   let dotClass="dot-active";
 if(st.cls==="soon") dotClass="dot-soon";
 if(st.cls==="expired") dotClass="dot-expired";
@@ -521,10 +980,9 @@ tbody.innerHTML+=`
  <td class="${st.cls}">${st.t}</td>
  <td>
 
-   <a class="remind" target="_blank"
-   href="https://wa.me/57${c.telefono}?text=${encodeURIComponent(msg)}">
-   🔔
-   </a>
+  <button class="remind" type="button" onclick="openNotifyModal('${c.id}')">
+  🔔
+  </button>
 
    <button class="action-btn edit-btn" onclick="edit('${c.id}')">🗑️ </button>
    <button class="action-btn del-btn" onclick="remove('${c.id}')">🖊️</button>
@@ -543,6 +1001,17 @@ tbody.innerHTML+=`
    SAVE / CREATE / UPDATE & DELETE
 ========================================================= */
 async function save(){
+ const requiredFields=[mNombre,mTelefono,mCiudad,mServicio,mFrecuencia,mValor];
+ const emptyFields=requiredFields.filter(input=>!String(input.value || "").trim());
+
+ requiredFields.forEach(input=>input.classList.remove("input-error"));
+ formError.style.display="none";
+
+ if(emptyFields.length){
+  emptyFields.forEach(input=>input.classList.add("input-error"));
+  formError.style.display="block";
+  return;
+ }
 
  loaderSave.style.display="flex";
 
@@ -570,7 +1039,7 @@ async function save(){
  });
 
  loaderSave.style.display="none";
- modal.style.display="none";
+ closeFormModal();
  editingId=null;
  load();
 }
@@ -580,6 +1049,8 @@ async function save(){
 function edit(id){
  const c=data.find(x=>x.id==id);
  editingId=id;
+ formError.style.display="none";
+ [mNombre,mTelefono,mCiudad,mServicio,mFrecuencia,mValor].forEach(input=>input.classList.remove("input-error"));
  mNombre.value=c.nombre;
  mTelefono.value=c.telefono;
  mCiudad.value=c.ciudad;
@@ -610,10 +1081,31 @@ async function remove(id){
 ========================================================= */
 function openModal(){
  editingId=null;
+ formError.style.display="none";
+ [mNombre,mTelefono,mCiudad,mServicio,mFrecuencia,mValor].forEach(input=>{
+  input.value="";
+  input.classList.remove("input-error");
+ });
  modal.style.display="flex";
 }
 
-modal.onclick=e=>e.target===modal&&(modal.style.display="none");
+function closeFormModal(){
+ modal.style.display="none";
+ editingId=null;
+ formError.style.display="none";
+ [mNombre,mTelefono,mCiudad,mServicio,mFrecuencia,mValor].forEach(input=>input.classList.remove("input-error"));
+}
+
+modal.onclick=e=>e.target===modal&&closeFormModal();
+notifyModal.onclick=e=>e.target===notifyModal&&closeNotifyModal();
+notifyType.onchange=updateNotifyPreview;
+[mNombre,mTelefono,mCiudad,mServicio,mFrecuencia,mValor].forEach(input=>{
+ input.oninput=()=>{
+  input.classList.remove("input-error");
+  const hasErrors=[mNombre,mTelefono,mCiudad,mServicio,mFrecuencia,mValor].some(field=>field.classList.contains("input-error"));
+  if(!hasErrors) formError.style.display="none";
+ };
+});
 
 /* =========================================================
    EVENTS
@@ -624,6 +1116,7 @@ search.oninput=filterCity.onchange=filterState.onchange=render;
    INIT
 ========================================================= */
 load();
+bootstrapAssistant();
 setInterval(()=>load(false),120000);
 
 
