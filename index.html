@@ -546,6 +546,21 @@ footer{
 <section class="filters">
 <input id="search" placeholder="Buscar cliente o cualquier dato">
 <select id="filterCity"><option value="">Todas ciudades</option></select>
+<select id="filterMonth">
+<option value="">Todos los meses</option>
+<option value="0">Enero</option>
+<option value="1">Febrero</option>
+<option value="2">Marzo</option>
+<option value="3">Abril</option>
+<option value="4">Mayo</option>
+<option value="5">Junio</option>
+<option value="6">Julio</option>
+<option value="7">Agosto</option>
+<option value="8">Septiembre</option>
+<option value="9">Octubre</option>
+<option value="10">Noviembre</option>
+<option value="11">Diciembre</option>
+</select>
 <select id="filterState">
 <option value="">Todos</option>
 <option value="soon">Por vencer</option>
@@ -655,6 +670,12 @@ function normalizeText(value=""){
 
 function formatMoney(value){
  return `$${Number(value || 0).toLocaleString()}`;
+}
+
+function getClientMonth(client){
+ const sourceDate=client.fecha || `${client.contactoMes || ""}-01`;
+ const date=new Date(sourceDate);
+ return Number.isNaN(date.getTime()) ? null : date.getMonth();
 }
 
 function describeService(servicio=""){
@@ -943,6 +964,7 @@ function render(){
 
  const q=search.value.toLowerCase();
  const city=filterCity.value;
+ const month=filterMonth.value;
  const stf=filterState.value;
 
  tbody.innerHTML="";
@@ -955,6 +977,7 @@ function render(){
 
   if(q && !Object.values(c).join(" ").toLowerCase().includes(q)) return;
   if(city && c.ciudad!==city) return;
+  if(month!=="" && getClientMonth(c)!==Number(month)) return;
   if(stf && st.cls!==stf) return;
 
   if(st.cls==="soon")soon++;
@@ -1110,7 +1133,7 @@ notifyType.onchange=updateNotifyPreview;
 /* =========================================================
    EVENTS
 ========================================================= */
-search.oninput=filterCity.onchange=filterState.onchange=render;
+search.oninput=filterCity.onchange=filterMonth.onchange=filterState.onchange=render;
 
 /* =========================================================
    INIT
@@ -1123,5 +1146,3 @@ setInterval(()=>load(false),120000);
 </script>
 </body>
 </html>
-
-
