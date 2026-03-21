@@ -83,14 +83,6 @@ body{
  box-shadow:0 10px 30px rgba(0,0,0,.4);
 }
 
-.sidebar-assistant{
- width:100%;
- margin-top:auto;
- display:flex;
- flex-direction:column;
- gap:12px;
-}
-
 
 /* =========================================================
    MAIN
@@ -109,6 +101,12 @@ body{
  align-items:center;
 }
 
+.topbar-actions{
+ display:flex;
+ gap:12px;
+ align-items:center;
+}
+
 .btn{
  background:linear-gradient(135deg,#4cc9f0,#4361ee);
  border:none;
@@ -118,6 +116,16 @@ body{
  font-weight:600;
  cursor:pointer;
  box-shadow:0 0 24px rgba(76,201,240,.4);
+}
+
+.btn-elite{
+ background:linear-gradient(135deg,#ff9a1f,#ff5a00);
+ color:#fff7ef;
+ box-shadow:0 0 26px rgba(255,122,24,.55);
+}
+
+.btn-elite:hover{
+ filter:brightness(1.05);
 }
 
 /* =========================================================
@@ -213,6 +221,14 @@ tr.expired td{background:rgba(255,107,107,.12)}
  justify-content:center;
 }
 
+#assistantModal{
+ background:rgba(4,9,22,.58);
+ backdrop-filter:blur(14px);
+ align-items:center;
+ justify-content:center;
+ padding:28px;
+}
+
 .modal-box{
  background:#0d122b;
  padding:30px;
@@ -226,6 +242,94 @@ tr.expired td{background:rgba(255,107,107,.12)}
 
 .modal-wide{
  width:min(760px,92vw);
+}
+
+.assistant-modal{
+ width:min(920px,90vw);
+ max-height:82vh;
+ padding:22px;
+ background:linear-gradient(180deg,rgba(9,16,38,.98) 0%,rgba(7,12,28,.98) 100%);
+ color:#e9f0ff;
+ border:1px solid rgba(113,144,255,.22);
+ position:relative;
+ overflow:hidden;
+ border-radius:34px;
+ box-shadow:0 26px 80px rgba(1,4,12,.55);
+}
+
+.assistant-modal::before{
+ content:"";
+ position:absolute;
+ inset:auto auto 8% 8%;
+ width:220px;
+ height:220px;
+ background:radial-gradient(circle,rgba(76,201,240,.18),transparent 72%);
+ filter:blur(10px);
+ pointer-events:none;
+}
+
+.assistant-modal::after{
+ content:"";
+ position:absolute;
+ top:10%;
+ right:8%;
+ width:240px;
+ height:240px;
+ background:radial-gradient(circle,rgba(255,122,24,.16),transparent 72%);
+ filter:blur(12px);
+ pointer-events:none;
+}
+
+.assistant-shell{
+ position:relative;
+ z-index:1;
+ display:flex;
+ flex-direction:column;
+  gap:18px;
+ overflow:auto;
+ padding:4px 6px 10px;
+}
+
+.assistant-modal .modal-header{
+ justify-content:flex-end;
+}
+
+.assistant-modal .close-x{
+ color:#edf3ff;
+ border-color:rgba(113,144,255,.22);
+ background:rgba(255,255,255,.06);
+}
+
+.assistant-hero{
+ text-align:center;
+ padding:10px 12px 2px;
+}
+
+.assistant-orb{
+ width:70px;
+ height:70px;
+ margin:0 auto 12px;
+ border-radius:50%;
+ background:radial-gradient(circle at 35% 30%,#fff,rgba(133,161,255,.9) 40%,rgba(108,233,255,.7) 62%,rgba(255,170,112,.52) 82%,transparent 100%);
+ box-shadow:0 14px 40px rgba(76,201,240,.22);
+}
+
+.assistant-hero h2{
+ margin:0;
+ font-size:36px;
+ line-height:1.08;
+ letter-spacing:-.03em;
+}
+
+.assistant-hero .accent{
+ color:#7ecbff;
+}
+
+.assistant-subtitle{
+ margin:10px auto 0;
+ color:rgba(233,240,255,.72);
+ font-size:15px;
+ max-width:620px;
 }
 
 .modal-header{
@@ -301,11 +405,11 @@ tr.expired td{background:rgba(255,107,107,.12)}
 }
 
 .assistant-box{
- background:var(--glass);
- border:1px solid var(--border);
- border-radius:var(--radius);
- box-shadow:var(--shadow);
- padding:18px;
+ background:rgba(255,255,255,.05);
+ border:1px solid rgba(113,144,255,.14);
+ border-radius:28px;
+ box-shadow:0 18px 55px rgba(0,0,0,.22);
+ padding:20px;
 }
 
 .assistant-box h3{
@@ -314,7 +418,7 @@ tr.expired td{background:rgba(255,107,107,.12)}
 
 .assistant-box p{
  margin:0 0 14px;
- opacity:.78;
+ opacity:.86;
  font-size:14px;
 }
 
@@ -322,7 +426,8 @@ tr.expired td{background:rgba(255,107,107,.12)}
  display:flex;
  flex-direction:column;
  gap:10px;
- max-height:260px;
+ min-height:180px;
+ max-height:240px;
  overflow:auto;
  padding-right:4px;
 }
@@ -336,48 +441,60 @@ tr.expired td{background:rgba(255,107,107,.12)}
 
 .chat-user{
  align-self:flex-end;
- background:linear-gradient(135deg,#4cc9f0,#4361ee);
+ background:linear-gradient(135deg,#ff9a1f,#ff5a00);
  color:white;
  max-width:85%;
 }
 
 .chat-bot{
  align-self:flex-start;
- background:#091126;
- border:1px solid rgba(255,255,255,.1);
+ background:rgba(11,20,48,.92);
+ border:1px solid rgba(113,144,255,.16);
+ color:#e9f0ff;
  max-width:100%;
 }
 
 .chat-form{
  display:flex;
- flex-direction:column;
- gap:10px;
+ align-items:flex-end;
+  gap:10px;
  margin-top:14px;
 }
 
 .chat-form input{
  flex:1;
- padding:12px;
- border-radius:12px;
- border:1px solid var(--border);
- background:#0005;
- color:white;
+  padding:12px;
+ border-radius:18px;
+ border:1px solid rgba(113,144,255,.18);
+ background:rgba(255,255,255,.06);
+ color:#e9f0ff;
+}
+
+.chat-form input::placeholder{
+ color:rgba(233,240,255,.45);
 }
 
 .chat-tips{
- display:grid;
- grid-template-columns:1fr;
+ display:flex;
+ flex-wrap:wrap;
  gap:8px;
 }
 
 .tip-btn{
- border:1px solid var(--border);
- background:#0004;
- color:var(--text);
- border-radius:12px;
- padding:10px 12px;
+ border:1px solid rgba(113,144,255,.18);
+ background:rgba(255,255,255,.05);
+ color:#e9f0ff;
+ border-radius:999px;
+ padding:9px 14px;
  cursor:pointer;
  text-align:left;
+}
+
+.chat-send{
+ min-width:58px;
+ min-height:52px;
+ border-radius:18px;
+ padding:0 16px;
 }
 
 
@@ -454,10 +571,6 @@ footer{
   border-bottom:1px solid var(--border);
  }
 
- .sidebar-assistant{
-  margin-top:0;
- }
-
  .logo{
   max-width:110px;
  }
@@ -472,6 +585,11 @@ footer{
   gap:12px;
  }
 
+ .topbar-actions{
+  width:100%;
+  flex-direction:column;
+ }
+
  .filters{
   flex-direction:column;
  }
@@ -479,6 +597,25 @@ footer{
 }
 
 @media (max-width:600px){
+
+ #assistantModal{
+  padding:16px;
+ }
+
+ .assistant-modal{
+  width:min(100%,94vw);
+  max-height:88vh;
+  padding:16px;
+  border-radius:24px;
+ }
+
+ .assistant-hero h2{
+  font-size:28px;
+ }
+
+ .chat-form{
+  flex-direction:column;
+ }
 
  th,td{
   padding:10px;
@@ -504,28 +641,6 @@ footer{
 <aside class="sidebar">
 <h2>Limpieza Elite</h2>
 <img src="images/logo.png" class="logo">
-<section class="sidebar-assistant">
-<div class="assistant-box">
-<h3>Asistente CRM</h3>
-<p>Haz preguntas sobre clientes, servicios, ciudades, vencimientos o actividad reciente y el sistema respondera usando la informacion del CRM.</p>
-<div id="chatLog" class="chat-log"></div>
-<form class="chat-form" onsubmit="askAssistant(event)">
-<input id="chatInput" placeholder="Ejemplo: cuantos clientes vencidos hay en Bogota">
-<button class="btn" type="submit">Preguntar</button>
-</form>
-</div>
-<div class="assistant-box">
-<h3>Preguntas sugeridas</h3>
-<div class="chat-tips">
-<button class="tip-btn" type="button" onclick="fillChatQuestion('Cuantos clientes hay en total?')">Clientes totales</button>
-<button class="tip-btn" type="button" onclick="fillChatQuestion('Que servicios son los mas frecuentes?')">Servicios frecuentes</button>
-<button class="tip-btn" type="button" onclick="fillChatQuestion('Cuantos clientes estan por vencer?')">Por vencer</button>
-<button class="tip-btn" type="button" onclick="fillChatQuestion('Cuantos clientes vencidos hay?')">Vencidos</button>
-<button class="tip-btn" type="button" onclick="fillChatQuestion('Que clientes hay en Bogota?')">Clientes por ciudad</button>
-<button class="tip-btn" type="button" onclick="fillChatQuestion('Busca el cliente Carlos')">Buscar cliente</button>
-</div>
-</div>
-</section>
 </aside>
 
 
@@ -533,7 +648,10 @@ footer{
 
 <div class="topbar">
 <h1>CRM de Servicios</h1>
+<div class="topbar-actions">
+<button class="btn btn-elite" type="button" onclick="openAssistantModal()">Asistente Elite</button>
 <button class="btn" onclick="openModal()">+ Nuevo Cliente</button>
+</div>
 </div>
 
 <section class="kpis">
@@ -575,6 +693,7 @@ footer{
 <th>Nombre</th>
 <th>Teléfono</th>
 <th>Ciudad</th>
+<th>Direccion</th>
 <th>Servicio</th>
 <th>Frecuencia</th>
 <th>Valor</th>
@@ -601,6 +720,7 @@ footer{
 <input id="mNombre" placeholder="Nombre">
 <input id="mTelefono" placeholder="Teléfono">
 <input id="mCiudad" placeholder="Ciudad">
+<input id="mDireccion" placeholder="Direccion">
 <input id="mServicio" placeholder="Servicio">
 <input id="mFrecuencia" type="number" placeholder="Frecuencia meses">
 <input id="mValor" type="number" placeholder="Valor">
@@ -630,6 +750,40 @@ footer{
 </div>
 </div>
 
+<div class="modal" id="assistantModal">
+<div class="modal-box assistant-modal">
+<div class="modal-header">
+<div></div>
+<button class="close-x" type="button" onclick="closeAssistantModal()" aria-label="Cerrar">X</button>
+</div>
+<div class="assistant-shell">
+<div class="assistant-hero">
+<div class="assistant-orb"></div>
+<h2>Buen dia,<br><span class="accent">Como puede ayudarte Elite hoy?</span></h2>
+<p class="assistant-subtitle">Haz preguntas sobre clientes, servicios, ciudades, vencimientos o actividad reciente y el sistema respondera usando la informacion del CRM.</p>
+</div>
+<div class="assistant-box">
+<div id="chatLog" class="chat-log"></div>
+<form class="chat-form" onsubmit="askAssistant(event)">
+<input id="chatInput" placeholder="Inicia una consulta o escribe una pregunta para el asistente...">
+<button class="btn btn-elite chat-send" type="button" onclick="askAssistant()">Enviar</button>
+</form>
+</div>
+<div class="assistant-box">
+<h3>Preguntas sugeridas</h3>
+<div class="chat-tips">
+<button class="tip-btn" type="button" onclick="fillChatQuestion('Cuantos clientes hay en total?')">Clientes totales</button>
+<button class="tip-btn" type="button" onclick="fillChatQuestion('Que servicios son los mas frecuentes?')">Servicios frecuentes</button>
+<button class="tip-btn" type="button" onclick="fillChatQuestion('Cuantos clientes estan por vencer?')">Por vencer</button>
+<button class="tip-btn" type="button" onclick="fillChatQuestion('Cuantos clientes vencidos hay?')">Vencidos</button>
+<button class="tip-btn" type="button" onclick="fillChatQuestion('Que clientes hay en Bogota?')">Clientes por ciudad</button>
+<button class="tip-btn" type="button" onclick="fillChatQuestion('Busca el cliente Carlos')">Buscar cliente</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
 <!-- LOADERS -->
 <div id="loaderLoad" class="loader"><div class="spinner"></div></div>
 <div id="loaderSave" class="loader"><div class="spinner"></div></div>
@@ -640,12 +794,15 @@ footer{
 /* =========================================================
    CONFIG
 ========================================================= */
-const API="https://script.google.com/macros/s/AKfycbyxzrgkxJLz9UCNAZDubBWXTuH_Es-TmvKS5MD29AP9b8e3v2yARM40M2hwf14urob_sg/exec";
+const API="https://script.google.com/macros/s/AKfycbyAA0ka7HbJCSVZ-JtnYsCrPx8YL3uQ1ARWfV7YYqMQS0y77dlCKqpKfZ2D8wavsSLHhA/exec";
 let data=[];
 let editingId=null;
 let lastCount=0;
 let notifyingClientId=null;
 let chatBootstrapped=false;
+const assistantModalEl=document.getElementById("assistantModal");
+const chatLogEl=document.getElementById("chatLog");
+const chatInputEl=document.getElementById("chatInput");
 
 /* =========================================================
    UTILIDADES
@@ -756,6 +913,16 @@ function closeNotifyModal(){
  notifyingClientId=null;
 }
 
+function openAssistantModal(){
+ assistantModalEl.style.display="flex";
+ bootstrapAssistant();
+ setTimeout(()=>chatInputEl.focus(),60);
+}
+
+function closeAssistantModal(){
+ assistantModalEl.style.display="none";
+}
+
 function sendWhatsAppNotification(){
  const client=data.find(x=>x.id==notifyingClientId);
  if(!client) return;
@@ -775,13 +942,13 @@ function appendChatMessage(role,text){
  const item=document.createElement("div");
  item.className=`chat-msg ${role==="user"?"chat-user":"chat-bot"}`;
  item.textContent=text;
- chatLog.appendChild(item);
- chatLog.scrollTop=chatLog.scrollHeight;
+ chatLogEl.appendChild(item);
+ chatLogEl.scrollTop=chatLogEl.scrollHeight;
 }
 
 function fillChatQuestion(question){
- chatInput.value=question;
- chatInput.focus();
+ chatInputEl.value=question;
+ chatInputEl.focus();
 }
 
 function getTopServices(limit=3){
@@ -797,6 +964,45 @@ function getTopServices(limit=3){
 
 function getClientsByStatus(targetStatus){
  return data.filter(c=>statusInfo(c.expiracion).cls===targetStatus);
+}
+
+function getTopCities(limit=5){
+ const map={};
+ data.forEach(c=>{
+  const key=(c.ciudad || "Sin ciudad").trim();
+  map[key]=(map[key] || 0)+1;
+ });
+ return Object.entries(map)
+  .sort((a,b)=>b[1]-a[1])
+  .slice(0,limit);
+}
+
+function getTopValueClients(limit=5){
+ return [...data]
+  .sort((a,b)=>Number(b.valor || 0)-Number(a.valor || 0))
+  .slice(0,limit);
+}
+
+function getMonthName(monthIndex){
+ const months=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+ return months[monthIndex] || "";
+}
+
+function extractMonthFromQuestion(question){
+ const q=normalizeText(question);
+ for(let i=0;i<12;i++){
+  if(q.includes(getMonthName(i))) return i;
+ }
+ return null;
+}
+
+function extractServiceFromQuestion(question){
+ const normalizedQuestion=normalizeText(question);
+ const match=data
+  .map(c=>c.servicio)
+  .filter(Boolean)
+  .find(service=>normalizedQuestion.includes(normalizeText(service)));
+ return match || "";
 }
 
 function extractCityFromQuestion(question){
@@ -822,7 +1028,7 @@ function answerByClientSearch(question){
 
  return matches.slice(0,5).map(c=>{
   const st=statusInfo(c.expiracion);
-  return `${c.nombre} | ${c.ciudad} | ${c.servicio} | ${st.t} | ${formatMoney(c.valor)}`;
+  return `${c.nombre} | ${c.ciudad} | ${c.direccion || "Sin direccion"} | ${c.servicio} | ${st.t} | ${formatMoney(c.valor)}`;
  }).join("\n");
 }
 
@@ -831,8 +1037,28 @@ function generateAssistantReply(question){
  if(!data.length) return "Todavia no hay datos cargados en el CRM para responder.";
 
  const city=extractCityFromQuestion(question);
+ const month=extractMonthFromQuestion(question);
+ const service=extractServiceFromQuestion(question);
+
+ if(q.includes("resumen") || q.includes("analiza") || q.includes("analisis") || q.includes("dashboard")){
+  const soonClients=getClientsByStatus("soon").length;
+  const expiredClients=getClientsByStatus("expired").length;
+  const topServices=getTopServices();
+  const topCities=getTopCities();
+  return [
+   `Resumen del CRM: ${data.length} clientes registrados.`,
+   `Por vencer: ${soonClients}.`,
+   `Vencidos: ${expiredClients}.`,
+   `Servicios mas frecuentes: ${topServices.map(([name,count])=>`${name} (${count})`).join(", ") || "sin datos"}.`,
+   `Ciudades con mas clientes: ${topCities.map(([name,count])=>`${name} (${count})`).join(", ") || "sin datos"}.`
+  ].join("\n");
+ }
 
  if(q.includes("total") || q.includes("cuantos clientes hay")){
+  if(month!==null){
+   const monthClients=data.filter(c=>getClientMonth(c)===month);
+   return `En ${getMonthName(month)} se registraron ${monthClients.length} clientes${monthClients.length?`: ${monthClients.slice(0,8).map(c=>c.nombre).join(", ")}`:"."}`;
+  }
   return `Actualmente hay ${data.length} clientes registrados en el CRM.`;
  }
 
@@ -855,6 +1081,10 @@ function generateAssistantReply(question){
  }
 
  if(q.includes("servicio") || q.includes("servicios")){
+  if(service){
+   const serviceClients=data.filter(c=>normalizeText(c.servicio)===normalizeText(service));
+   return `Hay ${serviceClients.length} clientes con el servicio ${service}${serviceClients.length?`: ${serviceClients.slice(0,8).map(c=>c.nombre).join(", ")}`:"."}`;
+  }
   const top=getTopServices();
   if(!top.length) return "No hay servicios suficientes para analizar.";
   return `Los servicios mas frecuentes son: ${top.map(([name,count])=>`${name} (${count})`).join(", ")}.`;
@@ -873,12 +1103,32 @@ function generateAssistantReply(question){
   return `Distribucion por ciudad: ${Object.entries(totals).sort((a,b)=>b[1]-a[1]).map(([name,count])=>`${name} (${count})`).join(", ")}.`;
  }
 
+ if(q.includes("direccion") || q.includes("dirección")){
+  if(q.includes("cliente") || q.includes("busca")){
+   return answerByClientSearch(question);
+  }
+  const withAddress=data.filter(c=>String(c.direccion || "").trim());
+  return `Hay ${withAddress.length} clientes con direccion registrada${withAddress.length?`. Algunos son: ${withAddress.slice(0,6).map(c=>`${c.nombre} (${c.direccion})`).join(", ")}`:"."}`;
+ }
+
+ if(q.includes("mes") || month!==null){
+  if(month!==null){
+   const monthClients=data.filter(c=>getClientMonth(c)===month);
+   return `En ${getMonthName(month)} se agregaron ${monthClients.length} clientes${monthClients.length?`: ${monthClients.slice(0,8).map(c=>c.nombre).join(", ")}`:"."}`;
+  }
+  return "Puedes preguntarme por un mes especifico, por ejemplo: cuantos clientes se agregaron en marzo.";
+ }
+
  if(q.includes("reciente") || q.includes("7 dias") || q.includes("ultimos servicios")){
   const recentClients=data.filter(c=>Date.now()-new Date(c.fecha)<7*86400000);
   return `En los ultimos 7 dias hay ${recentClients.length} registros${recentClients.length?`: ${recentClients.slice(0,6).map(c=>c.nombre).join(", ")}`:"."}`;
  }
 
  if(q.includes("valor") || q.includes("ingreso")){
+  if(q.includes("mas alto") || q.includes("mayor") || q.includes("caro")){
+   const topValue=getTopValueClients();
+   return `Los clientes con mayor valor registrado son: ${topValue.map(c=>`${c.nombre} (${formatMoney(c.valor)})`).join(", ")}.`;
+  }
   const total=data.reduce((sum,c)=>sum+Number(c.valor || 0),0);
   return `El valor acumulado de los registros es ${formatMoney(total)}.`;
  }
@@ -900,11 +1150,11 @@ function generateAssistantReply(question){
 
 function askAssistant(event){
  if(event) event.preventDefault();
- const question=chatInput.value.trim();
+ const question=chatInputEl.value.trim();
  if(!question) return;
 
  appendChatMessage("user",question);
- chatInput.value="";
+ chatInputEl.value="";
 
  const answer=generateAssistantReply(question);
  setTimeout(()=>appendChatMessage("bot",answer),180);
@@ -996,6 +1246,7 @@ tbody.innerHTML+=`
  </td>
  <td>${c.telefono}</td>
  <td>${c.ciudad}</td>
+ <td>${c.direccion || ""}</td>
  <td>${c.servicio}</td>
  <td>${c.frecuencia} meses</td>
  <td>$${Number(c.valor).toLocaleString()}</td>
@@ -1007,8 +1258,8 @@ tbody.innerHTML+=`
   🔔
   </button>
 
-   <button class="action-btn edit-btn" onclick="edit('${c.id}')">🗑️ </button>
-   <button class="action-btn del-btn" onclick="remove('${c.id}')">🖊️</button>
+   <button class="action-btn edit-btn" onclick="edit('${c.id}')">🖊️</button>
+   <button class="action-btn del-btn" onclick="remove('${c.id}')">🗑️</button>
 
  </td>
 </tr>`;
@@ -1024,7 +1275,7 @@ tbody.innerHTML+=`
    SAVE / CREATE / UPDATE & DELETE
 ========================================================= */
 async function save(){
- const requiredFields=[mNombre,mTelefono,mCiudad,mServicio,mFrecuencia,mValor];
+ const requiredFields=[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor];
  const emptyFields=requiredFields.filter(input=>!String(input.value || "").trim());
 
  requiredFields.forEach(input=>input.classList.remove("input-error"));
@@ -1048,6 +1299,7 @@ async function save(){
  nombre:mNombre.value,
  telefono:mTelefono.value,
  ciudad:mCiudad.value,
+ direccion:mDireccion.value,
  servicio:mServicio.value,
  frecuencia:mFrecuencia.value,
  valor:mValor.value,
@@ -1073,10 +1325,11 @@ function edit(id){
  const c=data.find(x=>x.id==id);
  editingId=id;
  formError.style.display="none";
- [mNombre,mTelefono,mCiudad,mServicio,mFrecuencia,mValor].forEach(input=>input.classList.remove("input-error"));
+ [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor].forEach(input=>input.classList.remove("input-error"));
  mNombre.value=c.nombre;
  mTelefono.value=c.telefono;
  mCiudad.value=c.ciudad;
+ mDireccion.value=c.direccion || "";
  mServicio.value=c.servicio;
  mFrecuencia.value=c.frecuencia;
  mValor.value=c.valor;
@@ -1105,7 +1358,7 @@ async function remove(id){
 function openModal(){
  editingId=null;
  formError.style.display="none";
- [mNombre,mTelefono,mCiudad,mServicio,mFrecuencia,mValor].forEach(input=>{
+ [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor].forEach(input=>{
   input.value="";
   input.classList.remove("input-error");
  });
@@ -1116,16 +1369,17 @@ function closeFormModal(){
  modal.style.display="none";
  editingId=null;
  formError.style.display="none";
- [mNombre,mTelefono,mCiudad,mServicio,mFrecuencia,mValor].forEach(input=>input.classList.remove("input-error"));
+ [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor].forEach(input=>input.classList.remove("input-error"));
 }
 
 modal.onclick=e=>e.target===modal&&closeFormModal();
 notifyModal.onclick=e=>e.target===notifyModal&&closeNotifyModal();
+assistantModalEl.onclick=e=>e.target===assistantModalEl&&closeAssistantModal();
 notifyType.onchange=updateNotifyPreview;
-[mNombre,mTelefono,mCiudad,mServicio,mFrecuencia,mValor].forEach(input=>{
+[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor].forEach(input=>{
  input.oninput=()=>{
   input.classList.remove("input-error");
-  const hasErrors=[mNombre,mTelefono,mCiudad,mServicio,mFrecuencia,mValor].some(field=>field.classList.contains("input-error"));
+  const hasErrors=[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor].some(field=>field.classList.contains("input-error"));
   if(!hasErrors) formError.style.display="none";
  };
 });
