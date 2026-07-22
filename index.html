@@ -143,6 +143,25 @@ body{
  background:var(--glass);
  border:1px solid var(--border);
  box-shadow:var(--shadow);
+ cursor:pointer;
+ transition:transform .18s ease,border-color .18s ease,background .18s ease;
+ position:relative;
+ overflow:hidden;
+ text-align:left;
+ color:var(--text);
+ font:inherit;
+ appearance:none;
+}
+
+.kpi:hover{
+ transform:translateY(-2px);
+ border-color:rgba(76,201,240,.45);
+ background:rgba(255,255,255,.11);
+}
+
+.kpi.active{
+ border-color:rgba(76,201,240,.72);
+ box-shadow:0 18px 55px rgba(76,201,240,.18);
 }
 
 .kpi span{opacity:.7;font-size:13px}
@@ -152,7 +171,8 @@ body{
    FILTERS
 ========================================================= */
 .filters{
- display:flex;
+ display:grid;
+ grid-template-columns:minmax(220px,1.4fr) repeat(3,minmax(150px,1fr));
  gap:12px;
  padding:16px;
  background:var(--glass);
@@ -160,7 +180,23 @@ body{
  border-radius:var(--radius);
 }
 
+.filter-field{
+ display:flex;
+ flex-direction:column;
+ gap:7px;
+ min-width:0;
+}
+
+.filter-field label{
+ color:rgba(233,240,255,.72);
+ font-size:12px;
+ font-weight:700;
+ letter-spacing:.02em;
+ text-transform:uppercase;
+}
+
 .filters input,.filters select{
+ width:100%;
  padding:12px;
  border-radius:12px;
  border:1px solid var(--border);
@@ -194,18 +230,22 @@ tr.expired td{background:rgba(255,107,107,.12)}
    BOTON RECORDAR
 ========================================================= */
 .remind{
- background:#a48a4d;
+ background:linear-gradient(135deg,#25d366,#128c7e);
  border:none;
- color:#08223f;
- padding: 3px 9px;
+ color:white;
+ width:34px;
+ height:34px;
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
  border-radius:10px;
  cursor:pointer;
  font-weight:700;
  text-decoration:none;
+ box-shadow:0 8px 22px rgba(37,211,102,.22);
 }
 .remind:hover{
- background:#08223f;
- color:#ffd166;
+ filter:brightness(1.08);
 }
 
 /* =========================================================
@@ -404,6 +444,20 @@ tr.expired td{background:rgba(255,107,107,.12)}
  font-size:13px;
 }
 
+.modal-field{
+ display:flex;
+ flex-direction:column;
+ gap:7px;
+}
+
+.modal-field label{
+ color:rgba(233,240,255,.72);
+ font-size:12px;
+ font-weight:700;
+ letter-spacing:.02em;
+ text-transform:uppercase;
+}
+
 .assistant-box{
  background:rgba(255,255,255,.05);
  border:1px solid rgba(113,144,255,.14);
@@ -513,14 +567,116 @@ tr.expired td{background:rgba(255,107,107,.12)}
 
 .action-btn{
  border:none;
- padding:8px 10px;
- border-radius:8px;
+ width:34px;
+ height:34px;
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ border-radius:10px;
  cursor:pointer;
  margin-left:4px;
+ transition:transform .16s ease,filter .16s ease;
+ box-shadow:0 8px 22px rgba(0,0,0,.22);
 }
-.edit-btn{background:#4cc9f0;color:#001;padding: 3px 9px;border-radius: 10px;margin-top: 10px;}
-.del-btn{background:#ff4d6d;color:white;padding: 3px 9px;border-radius: 10px;margin-top: 10px;}
 
+.action-btn:hover{
+ transform:translateY(-1px);
+ filter:brightness(1.08);
+}
+
+.edit-btn{background:linear-gradient(135deg,#4cc9f0,#4361ee);color:white;}
+.del-btn{background:linear-gradient(135deg,#ff4d6d,#b5173d);color:white;}
+
+
+/* =========================================================
+   ALERTAS INTELIGENTES
+========================================================= */
+.smart-alerts{
+ position:fixed;
+ right:24px;
+ top:100px;
+ width:min(360px,calc(100vw - 32px));
+ display:flex;
+ flex-direction:column;
+ gap:12px;
+ z-index:80;
+ pointer-events:none;
+}
+
+.smart-alert{
+ pointer-events:auto;
+ background:linear-gradient(180deg,rgba(13,18,43,.96),rgba(7,12,28,.96));
+ border:1px solid rgba(255,209,102,.32);
+ border-radius:18px;
+ padding:16px;
+ box-shadow:0 18px 60px rgba(0,0,0,.42),0 0 26px rgba(255,209,102,.08);
+ animation:slideAlert .28s ease both;
+}
+
+.smart-alert-header{
+ display:flex;
+ align-items:flex-start;
+ gap:12px;
+}
+
+.smart-alert-icon{
+ width:38px;
+ height:38px;
+ border-radius:14px;
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ background:rgba(255,209,102,.16);
+ color:#ffd166;
+ flex:0 0 auto;
+}
+
+.smart-alert-title{
+ margin:0;
+ font-weight:800;
+ font-size:14px;
+ line-height:1.25;
+}
+
+.smart-alert-text{
+ margin:5px 0 0;
+ color:rgba(233,240,255,.74);
+ font-size:13px;
+ line-height:1.45;
+}
+
+.smart-alert-actions{
+ display:flex;
+ gap:8px;
+ margin-top:12px;
+}
+
+.smart-alert-btn{
+ border:none;
+ border-radius:12px;
+ min-height:36px;
+ padding:0 12px;
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ gap:8px;
+ cursor:pointer;
+ color:white;
+ font-weight:700;
+ background:linear-gradient(135deg,#25d366,#128c7e);
+ box-shadow:0 8px 22px rgba(37,211,102,.24);
+}
+
+.smart-alert-btn.secondary{
+ background:rgba(255,255,255,.08);
+ border:1px solid rgba(255,255,255,.14);
+ box-shadow:none;
+}
+
+@keyframes slideAlert{
+ from{opacity:0;transform:translateX(18px)}
+ to{opacity:1;transform:translateX(0)}
+}
 
 /* =========================================================
    LOADERS
@@ -591,7 +747,16 @@ footer{
  }
 
  .filters{
-  flex-direction:column;
+  grid-template-columns:1fr;
+ }
+
+ .smart-alerts{
+  top:auto;
+  right:16px;
+  bottom:16px;
+  width:calc(100vw - 32px);
+  max-height:42vh;
+  overflow:auto;
  }
 
 }
@@ -655,15 +820,23 @@ footer{
 </div>
 
 <section class="kpis">
-<div class="kpi"><span>Total</span><h2 id="kTotal">0</h2></div>
-<div class="kpi"><span>Por vencer</span><h2 id="kSoon">0</h2></div>
-<div class="kpi"><span>Vencidos</span><h2 id="kExpired">0</h2></div>
-<div class="kpi"><span>7 días</span><h2 id="kRecent">0</h2></div>
+<button class="kpi active" type="button" data-kpi="total" onclick="setKpiFilter('total')"><span>Total</span><h2 id="kTotal">0</h2></button>
+<button class="kpi" type="button" data-kpi="soon" onclick="setKpiFilter('soon')"><span>Por vencer</span><h2 id="kSoon">0</h2></button>
+<button class="kpi" type="button" data-kpi="expired" onclick="setKpiFilter('expired')"><span>Vencidos</span><h2 id="kExpired">0</h2></button>
+<button class="kpi" type="button" data-kpi="recent" onclick="setKpiFilter('recent')"><span>7 días</span><h2 id="kRecent">0</h2></button>
 </section>
 
 <section class="filters">
-<input id="search" placeholder="Buscar cliente o cualquier dato">
+<div class="filter-field">
+<label for="search">Buscar cliente</label>
+<input id="search" placeholder="Nombre, telefono, ciudad o servicio">
+</div>
+<div class="filter-field">
+<label for="filterCity">Ciudad</label>
 <select id="filterCity"><option value="">Todas ciudades</option></select>
+</div>
+<div class="filter-field">
+<label for="filterMonth">Mes de contacto</label>
 <select id="filterMonth">
 <option value="">Todos los meses</option>
 <option value="0">Enero</option>
@@ -679,11 +852,15 @@ footer{
 <option value="10">Noviembre</option>
 <option value="11">Diciembre</option>
 </select>
+</div>
+<div class="filter-field">
+<label for="filterState">Estado</label>
 <select id="filterState">
 <option value="">Todos</option>
 <option value="soon">Por vencer</option>
 <option value="expired">Vencidos</option>
 </select>
+</div>
 </section>
 
 <section class="table-wrap">
@@ -724,6 +901,24 @@ footer{
 <input id="mServicio" placeholder="Servicio">
 <input id="mFrecuencia" type="number" placeholder="Frecuencia meses">
 <input id="mValor" type="number" placeholder="Valor">
+<div class="modal-field">
+<label for="mContactoMes">Mes de contacto</label>
+<select id="mContactoMes">
+<option value="">Selecciona un mes</option>
+<option value="01">Enero</option>
+<option value="02">Febrero</option>
+<option value="03">Marzo</option>
+<option value="04">Abril</option>
+<option value="05">Mayo</option>
+<option value="06">Junio</option>
+<option value="07">Julio</option>
+<option value="08">Agosto</option>
+<option value="09">Septiembre</option>
+<option value="10">Octubre</option>
+<option value="11">Noviembre</option>
+<option value="12">Diciembre</option>
+</select>
+</div>
 <div id="formError" class="form-error">Completa todos los campos antes de guardar.</div>
 <button class="btn" onclick="save()">Guardar</button>
 </div>
@@ -788,6 +983,7 @@ footer{
 <div id="loaderLoad" class="loader"><div class="spinner"></div></div>
 <div id="loaderSave" class="loader"><div class="spinner"></div></div>
 <div id="loaderDelete" class="loader"><div class="spinner"></div></div>
+<aside id="smartAlerts" class="smart-alerts" aria-live="polite"></aside>
 
 <script>
 
@@ -795,10 +991,12 @@ footer{
    CONFIG
 ========================================================= */
 const API="https://script.google.com/macros/s/AKfycbyAA0ka7HbJCSVZ-JtnYsCrPx8YL3uQ1ARWfV7YYqMQS0y77dlCKqpKfZ2D8wavsSLHhA/exec";
+const CACHE_KEY="limpiezaEliteClientesCache";
 let data=[];
 let editingId=null;
 let lastCount=0;
 let notifyingClientId=null;
+let activeKpiFilter="total";
 let chatBootstrapped=false;
 const assistantModalEl=document.getElementById("assistantModal");
 const chatLogEl=document.getElementById("chatLog");
@@ -830,9 +1028,85 @@ function formatMoney(value){
 }
 
 function getClientMonth(client){
- const sourceDate=client.fecha || `${client.contactoMes || ""}-01`;
+ const sourceDate=client.contactoMes ? `${client.contactoMes}-01` : client.fecha;
  const date=new Date(sourceDate);
  return Number.isNaN(date.getTime()) ? null : date.getMonth();
+}
+
+function getMonthValueFromClient(client){
+ const month=getClientMonth(client);
+ return month===null ? "" : String(month+1).padStart(2,"0");
+}
+
+function buildContactoMes(monthValue,baseContactoMes=""){
+ const year=String(baseContactoMes || "").split("-")[0] || new Date().getFullYear();
+ return monthValue ? `${year}-${monthValue}` : "";
+}
+
+function buildExpirationDate(contactoMesValue,frequency){
+ const now=new Date();
+ const safeDay=Math.min(now.getDate(),28);
+ const [year,month]=String(contactoMesValue || "").split("-").map(Number);
+ const hasContactoMes=Number.isFinite(year) && Number.isFinite(month);
+ const base=hasContactoMes
+  ? new Date(year,month-1,safeDay,now.getHours(),now.getMinutes(),now.getSeconds())
+  : new Date(now);
+
+ base.setMonth(base.getMonth()+Number(frequency || 0));
+ return base.toISOString();
+}
+
+function persistCache(){
+ try{
+  localStorage.setItem(CACHE_KEY,JSON.stringify(data));
+ }catch(error){}
+}
+
+function hydrateFromCache(){
+ try{
+  const cached=JSON.parse(localStorage.getItem(CACHE_KEY) || "[]");
+  if(Array.isArray(cached) && cached.length){
+   data=cached;
+   buildCities();
+   updateFooter();
+   render();
+   return true;
+  }
+ }catch(error){}
+
+ return false;
+}
+
+async function postToApi(payload){
+ const response=await fetch(API,{
+  method:"POST",
+  body:JSON.stringify(payload)
+ });
+
+ if(!response.ok) throw new Error(`HTTP ${response.status}`);
+
+ let result;
+ try{
+  result=await response.json();
+ }catch(error){
+  result={status:"ok"};
+ }
+
+ if(result.status==="not_found" || result.status==="error"){
+  throw new Error(result.status);
+ }
+
+ return result;
+}
+
+function escapeHtml(value=""){
+ return String(value).replace(/[&<>"']/g,char=>({
+  "&":"&amp;",
+  "<":"&lt;",
+  ">":"&gt;",
+  "\"":"&quot;",
+  "'":"&#39;"
+ }[char]));
 }
 
 function describeService(servicio=""){
@@ -1179,11 +1453,94 @@ function updateFooter() {
    CIUDADES DINAMICAS
 ========================================================= */
 function buildCities(){
- const set=new Set(data.map(x=>x.ciudad));
- filterCity.innerHTML='<option value="">Todas ciudades</option>';
- set.forEach(c=>{
-  filterCity.innerHTML+=`<option>${c}</option>`;
+ const currentCity=filterCity.value;
+ const cities=[...new Set(data.map(x=>String(x.ciudad || "").trim()).filter(Boolean))]
+  .sort((a,b)=>a.localeCompare(b,"es",{sensitivity:"base"}));
+
+ filterCity.innerHTML=[
+  '<option value="">Todas ciudades</option>',
+  ...cities.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`)
+ ].join("");
+ filterCity.value=cities.includes(currentCity) ? currentCity : "";
+}
+
+function updateKpiActiveState(){
+ document.querySelectorAll(".kpi").forEach(kpi=>{
+  kpi.classList.toggle("active",kpi.dataset.kpi===activeKpiFilter);
  });
+}
+
+function setKpiFilter(type){
+ activeKpiFilter=type || "total";
+
+ if(activeKpiFilter==="soon") filterState.value="soon";
+ if(activeKpiFilter==="expired") filterState.value="expired";
+ if(activeKpiFilter==="recent" || activeKpiFilter==="total") filterState.value="";
+
+ updateKpiActiveState();
+ render();
+}
+
+function matchesKpiFilter(status,recent){
+ if(activeKpiFilter==="soon") return status.cls==="soon";
+ if(activeKpiFilter==="expired") return status.cls==="expired";
+ if(activeKpiFilter==="recent") return recent;
+ return true;
+}
+
+function getSoonClients(){
+ return data
+  .filter(client=>statusInfo(client.expiracion).cls==="soon")
+  .sort((a,b)=>new Date(a.expiracion)-new Date(b.expiracion));
+}
+
+function getSmartAlertMessage(count){
+ if(count===1) return "Hay 1 cliente por vencer. Conviene contactarlo hoy para asegurar la recompra.";
+ if(count<=3) return `Hay ${count} clientes por vencer. Prioriza el contacto antes de que se enfrien.`;
+ return `Hay ${count} clientes por vencer. Activa seguimiento por WhatsApp y agenda los casos mas urgentes.`;
+}
+
+function renderSmartAlerts(){
+ const soonClients=getSoonClients();
+
+ if(!soonClients.length){
+  smartAlerts.innerHTML="";
+  return;
+ }
+
+ const cards=[
+  `<article class="smart-alert">
+   <div class="smart-alert-header">
+    <span class="smart-alert-icon"><i class="fa-solid fa-bell"></i></span>
+    <div>
+     <p class="smart-alert-title">Seguimiento recomendado</p>
+     <p class="smart-alert-text">${escapeHtml(getSmartAlertMessage(soonClients.length))}</p>
+    </div>
+   </div>
+   <div class="smart-alert-actions">
+    <button class="smart-alert-btn secondary" type="button" onclick="setKpiFilter('soon')"><i class="fa-solid fa-filter"></i> Ver por vencer</button>
+   </div>
+  </article>`
+ ];
+
+ soonClients.slice(0,3).forEach(client=>{
+  const days=daysDiff(client.expiracion);
+  const dueText=days<=0 ? "vence hoy" : `vence en ${days} dia${days===1 ? "" : "s"}`;
+  cards.push(`<article class="smart-alert">
+   <div class="smart-alert-header">
+    <span class="smart-alert-icon"><i class="fa-brands fa-whatsapp"></i></span>
+    <div>
+     <p class="smart-alert-title">${escapeHtml(client.nombre || "Cliente sin nombre")}</p>
+     <p class="smart-alert-text">${escapeHtml(dueText)}. ${escapeHtml(client.servicio || "Servicio pendiente")} en ${escapeHtml(client.ciudad || "ciudad sin registrar")}.</p>
+    </div>
+   </div>
+   <div class="smart-alert-actions">
+    <button class="smart-alert-btn" type="button" onclick="openNotifyModal('${escapeHtml(client.id)}')"><i class="fa-brands fa-whatsapp"></i> Contactar</button>
+   </div>
+  </article>`);
+ });
+
+ smartAlerts.innerHTML=cards.join("");
 }
 
 /* =========================================================
@@ -1191,18 +1548,25 @@ function buildCities(){
 ========================================================= */
 async function load(showLoader=true){
 
- if(showLoader) loaderLoad.style.display="flex";
+ if(showLoader && !data.length) loaderLoad.style.display="flex";
 
- const r=await fetch(API+"?action=list");
+ try{
+ const r=await fetch(`${API}?action=list&_=${Date.now()}`,{cache:"no-store"});
  const newData=await r.json();
 
  if(showLoader) loaderLoad.style.display="none";
 
  // solo re-render si cambió la cantidad
- data=newData;
+ data=Array.isArray(newData) ? newData : [];
+ persistCache();
  buildCities();
  updateFooter();
  render();
+ }catch(error){
+  console.error("No se pudo cargar clientes",error);
+ }finally{
+  loaderLoad.style.display="none";
+ }
 
 }
 
@@ -1212,73 +1576,79 @@ async function load(showLoader=true){
 ========================================================= */
 function render(){
 
- const q=search.value.toLowerCase();
+ const q=normalizeText(search.value);
  const city=filterCity.value;
  const month=filterMonth.value;
  const stf=filterState.value;
 
- tbody.innerHTML="";
+ const rows=[];
  let soon=0,exp=0,recent=0;
  const now=Date.now();
 
  data.forEach(c=>{
 
   const st=statusInfo(c.expiracion);
+  const isRecent=now-new Date(c.fecha)<7*86400000;
 
-  if(q && !Object.values(c).join(" ").toLowerCase().includes(q)) return;
+  if(q && !normalizeText(Object.values(c).join(" ")).includes(q)) return;
   if(city && c.ciudad!==city) return;
   if(month!=="" && getClientMonth(c)!==Number(month)) return;
   if(stf && st.cls!==stf) return;
+  if(!matchesKpiFilter(st,isRecent)) return;
 
   if(st.cls==="soon")soon++;
   if(st.cls==="expired")exp++;
-  if(now-new Date(c.fecha)<7*86400000)recent++;
+  if(isRecent)recent++;
 
   let dotClass="dot-active";
 if(st.cls==="soon") dotClass="dot-soon";
 if(st.cls==="expired") dotClass="dot-expired";
 
-tbody.innerHTML+=`
+rows.push(`
 <tr class="${st.cls}">
  <td>
    <span class="status-dot ${dotClass}"></span>
-   ${c.nombre}
+   ${escapeHtml(c.nombre)}
  </td>
- <td>${c.telefono}</td>
- <td>${c.ciudad}</td>
- <td>${c.direccion || ""}</td>
- <td>${c.servicio}</td>
- <td>${c.frecuencia} meses</td>
- <td>$${Number(c.valor).toLocaleString()}</td>
- <td>${c.expiracion.split("T")[0]}</td>
+ <td>${escapeHtml(c.telefono)}</td>
+ <td>${escapeHtml(c.ciudad)}</td>
+ <td>${escapeHtml(c.direccion || "")}</td>
+ <td>${escapeHtml(c.servicio)}</td>
+ <td>${escapeHtml(c.frecuencia)} meses</td>
+ <td>$${Number(c.valor || 0).toLocaleString()}</td>
+ <td>${escapeHtml(String(c.expiracion || "").split("T")[0])}</td>
  <td class="${st.cls}">${st.t}</td>
  <td>
 
-  <button class="remind" type="button" onclick="openNotifyModal('${c.id}')">
-  🔔
+  <button class="remind" type="button" onclick="openNotifyModal('${escapeHtml(c.id)}')">
+  <i class="fa-brands fa-whatsapp"></i>
   </button>
 
-   <button class="action-btn edit-btn" onclick="edit('${c.id}')">🖊️</button>
-   <button class="action-btn del-btn" onclick="remove('${c.id}')">🗑️</button>
+   <button class="action-btn edit-btn" onclick="edit('${escapeHtml(c.id)}')"><i class="fa-solid fa-pen-to-square"></i></button>
+   <button class="action-btn del-btn" onclick="remove('${escapeHtml(c.id)}')"><i class="fa-solid fa-trash-can"></i></button>
 
  </td>
-</tr>`;
+</tr>`);
  });
 
+ tbody.innerHTML=rows.join("");
  kTotal.textContent=data.length;
  kSoon.textContent=soon;
  kExpired.textContent=exp;
  kRecent.textContent=recent;
+ updateKpiActiveState();
+ renderSmartAlerts();
 }
 
 /* =========================================================
    SAVE / CREATE / UPDATE & DELETE
 ========================================================= */
 async function save(){
- const requiredFields=[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor];
+ const requiredFields=[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes];
  const emptyFields=requiredFields.filter(input=>!String(input.value || "").trim());
 
  requiredFields.forEach(input=>input.classList.remove("input-error"));
+ formError.textContent="Completa todos los campos antes de guardar.";
  formError.style.display="none";
 
  if(emptyFields.length){
@@ -1289,9 +1659,10 @@ async function save(){
 
  loaderSave.style.display="flex";
 
+ try{
  const now=new Date();
- const exp=new Date(now);
- exp.setMonth(exp.getMonth()+Number(mFrecuencia.value));
+ const existingClient=editingId ? data.find(x=>x.id==editingId) : null;
+ const contactoMes=buildContactoMes(mContactoMes.value,existingClient?.contactoMes);
 
  const payload={
  action: editingId?"update":"create",
@@ -1303,20 +1674,34 @@ async function save(){
  servicio:mServicio.value,
  frecuencia:mFrecuencia.value,
  valor:mValor.value,
- fecha:now.toISOString(),
- contactoMes:now.toISOString().slice(0,7),
- expiracion:exp.toISOString()
+ fecha:existingClient?.fecha || now.toISOString(),
+ contactoMes,
+ expiracion:buildExpirationDate(contactoMes,mFrecuencia.value)
  };
 
- await fetch(API,{
-  method:"POST",
-  body:JSON.stringify(payload)
- });
+ const result=await postToApi(payload);
+ const savedClient={...payload,id:result.id || editingId || crypto.randomUUID()};
 
- loaderSave.style.display="none";
+ if(editingId){
+  data=data.map(client=>client.id==editingId ? savedClient : client);
+ }else{
+  data=[savedClient,...data];
+ }
+
+ persistCache();
+ buildCities();
+ render();
+
  closeFormModal();
  editingId=null;
- load();
+ load(false);
+ }catch(error){
+  console.error("No se pudo guardar cliente",error);
+  formError.textContent="No se pudo guardar el cliente. Intenta nuevamente.";
+  formError.style.display="block";
+ }finally{
+  loaderSave.style.display="none";
+ }
 }
 
 
@@ -1324,8 +1709,9 @@ async function save(){
 function edit(id){
  const c=data.find(x=>x.id==id);
  editingId=id;
+ formError.textContent="Completa todos los campos antes de guardar.";
  formError.style.display="none";
- [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor].forEach(input=>input.classList.remove("input-error"));
+ [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes].forEach(input=>input.classList.remove("input-error"));
  mNombre.value=c.nombre;
  mTelefono.value=c.telefono;
  mCiudad.value=c.ciudad;
@@ -1333,6 +1719,7 @@ function edit(id){
  mServicio.value=c.servicio;
  mFrecuencia.value=c.frecuencia;
  mValor.value=c.valor;
+ mContactoMes.value=getMonthValueFromClient(c);
  modal.style.display="flex";
 }
 
@@ -1342,13 +1729,19 @@ async function remove(id){
 
  loaderDelete.style.display="flex";
 
- await fetch(API,{
-   method:"POST",
-   body:JSON.stringify({action:"delete",id})
- });
-
- loaderDelete.style.display="none";
- load();
+ try{
+  await postToApi({action:"delete",id});
+  data=data.filter(client=>client.id!=id);
+  persistCache();
+  buildCities();
+  render();
+  load(false);
+ }catch(error){
+  console.error("No se pudo eliminar cliente",error);
+  alert("No se pudo eliminar el cliente. Intenta nuevamente.");
+ }finally{
+  loaderDelete.style.display="none";
+ }
 }
 
 
@@ -1357,42 +1750,55 @@ async function remove(id){
 ========================================================= */
 function openModal(){
  editingId=null;
+ formError.textContent="Completa todos los campos antes de guardar.";
  formError.style.display="none";
- [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor].forEach(input=>{
+ [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes].forEach(input=>{
   input.value="";
   input.classList.remove("input-error");
  });
+ mContactoMes.value=String(new Date().getMonth()+1).padStart(2,"0");
  modal.style.display="flex";
 }
 
 function closeFormModal(){
  modal.style.display="none";
  editingId=null;
+ formError.textContent="Completa todos los campos antes de guardar.";
  formError.style.display="none";
- [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor].forEach(input=>input.classList.remove("input-error"));
+ [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes].forEach(input=>input.classList.remove("input-error"));
 }
 
 modal.onclick=e=>e.target===modal&&closeFormModal();
 notifyModal.onclick=e=>e.target===notifyModal&&closeNotifyModal();
 assistantModalEl.onclick=e=>e.target===assistantModalEl&&closeAssistantModal();
 notifyType.onchange=updateNotifyPreview;
-[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor].forEach(input=>{
+[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes].forEach(input=>{
  input.oninput=()=>{
   input.classList.remove("input-error");
-  const hasErrors=[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor].some(field=>field.classList.contains("input-error"));
+  const hasErrors=[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes].some(field=>field.classList.contains("input-error"));
   if(!hasErrors) formError.style.display="none";
  };
 });
 
+function handleStateFilterChange(){
+ if(filterState.value==="soon") activeKpiFilter="soon";
+ else if(filterState.value==="expired") activeKpiFilter="expired";
+ else if(activeKpiFilter==="soon" || activeKpiFilter==="expired") activeKpiFilter="total";
+
+ render();
+}
+
 /* =========================================================
    EVENTS
 ========================================================= */
-search.oninput=filterCity.onchange=filterMonth.onchange=filterState.onchange=render;
+search.oninput=filterCity.onchange=filterMonth.onchange=render;
+filterState.onchange=handleStateFilterChange;
 
 /* =========================================================
    INIT
 ========================================================= */
-load();
+hydrateFromCache();
+load(!data.length);
 bootstrapAssistant();
 setInterval(()=>load(false),120000);
 
