@@ -245,12 +245,22 @@ th{opacity:.7;font-size:13px}
 
 .actions-head{
  text-align:center;
+ position:sticky;
+ right:0;
+ z-index:3;
+ background:#171d31;
+ box-shadow:-12px 0 18px rgba(5,8,20,.34);
 }
 
 .actions-cell{
  text-align:center;
  vertical-align:middle;
  white-space:nowrap;
+ position:sticky;
+ right:0;
+ z-index:2;
+ background:#151b2e;
+ box-shadow:-12px 0 18px rgba(5,8,20,.26);
 }
 
 .date-cell{
@@ -269,6 +279,10 @@ tr:hover td{background:rgba(76,201,240,.08)}
 
 tr.soon td{background:rgba(255,209,102,.12)}
 tr.expired td{background:rgba(255,107,107,.12)}
+
+tr:hover .actions-cell{background:#17233a}
+tr.soon .actions-cell{background:#292640}
+tr.expired .actions-cell{background:#2d1f37}
 
 .soon{color:#ffd166;font-weight:600}
 .expired{color:#ff6b6b;font-weight:700}
