@@ -238,29 +238,42 @@ body{
 
 table{
  width:100%;
+ table-layout:fixed;
  border-collapse:collapse;
 }
-th,td{padding:16px;border-bottom:1px solid #ffffff15}
+th,td{
+ padding:16px;
+ border-bottom:1px solid #ffffff15;
+ overflow:hidden;
+ text-overflow:ellipsis;
+ vertical-align:middle;
+}
 th{opacity:.7;font-size:13px}
+
+.col-name{width:10%}
+.col-phone{width:10%}
+.col-city{width:12%}
+.col-address{width:13%}
+.col-service{width:19%}
+.col-frequency{width:8%}
+.col-value{width:8%}
+.col-expiration{width:10%}
+.col-state{width:5%}
+.col-actions{width:5%}
 
 .actions-head{
  text-align:center;
- position:sticky;
- right:0;
- z-index:3;
- background:#171d31;
- box-shadow:-12px 0 18px rgba(5,8,20,.34);
+ padding-left:10px;
+ padding-right:10px;
 }
 
 .actions-cell{
  text-align:center;
  vertical-align:middle;
  white-space:nowrap;
- position:sticky;
- right:0;
- z-index:2;
- background:#151b2e;
- box-shadow:-12px 0 18px rgba(5,8,20,.26);
+ overflow:visible;
+ padding-left:10px;
+ padding-right:10px;
 }
 
 .date-cell{
@@ -279,10 +292,6 @@ tr:hover td{background:rgba(76,201,240,.08)}
 
 tr.soon td{background:rgba(255,209,102,.12)}
 tr.expired td{background:rgba(255,107,107,.12)}
-
-tr:hover .actions-cell{background:#17233a}
-tr.soon .actions-cell{background:#292640}
-tr.expired .actions-cell{background:#2d1f37}
 
 .soon{color:#ffd166;font-weight:600}
 .expired{color:#ff6b6b;font-weight:700}
@@ -958,16 +967,16 @@ footer{
 <table>
 <thead>
 <tr>
-<th>Nombre</th>
-<th>Teléfono</th>
-<th>Ciudad</th>
-<th>Direccion</th>
-<th>Servicio</th>
-<th>Frecuencia</th>
-<th>Valor</th>
-<th>Expiración</th>
-<th>Estado</th>
-<th class="actions-head">Acción</th>
+<th class="col-name">Nombre</th>
+<th class="col-phone">Teléfono</th>
+<th class="col-city">Ciudad</th>
+<th class="col-address">Direccion</th>
+<th class="col-service">Servicio</th>
+<th class="col-frequency">Frecuencia</th>
+<th class="col-value">Valor</th>
+<th class="col-expiration">Expiración</th>
+<th class="col-state">Estado</th>
+<th class="actions-head col-actions">Acción</th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -1714,19 +1723,19 @@ if(st.cls==="expired") dotClass="dot-expired";
 
 rows.push(`
 <tr class="${st.cls}">
- <td>
+ <td class="col-name">
    <span class="status-dot ${dotClass}"></span>
    ${escapeHtml(c.nombre)}
  </td>
- <td>${escapeHtml(c.telefono)}</td>
- <td>${escapeHtml(c.ciudad)}</td>
- <td>${escapeHtml(c.direccion || "")}</td>
- <td>${escapeHtml(c.servicio)}</td>
- <td>${escapeHtml(c.frecuencia)} meses</td>
- <td>$${Number(c.valor || 0).toLocaleString()}</td>
- <td class="date-cell">${escapeHtml(formatPrettyDate(c.expiracion))}</td>
- <td class="${st.cls}">${st.t}</td>
- <td class="actions-cell">
+ <td class="col-phone">${escapeHtml(c.telefono)}</td>
+ <td class="col-city">${escapeHtml(c.ciudad)}</td>
+ <td class="col-address">${escapeHtml(c.direccion || "")}</td>
+ <td class="col-service">${escapeHtml(c.servicio)}</td>
+ <td class="col-frequency">${escapeHtml(c.frecuencia)} meses</td>
+ <td class="col-value">$${Number(c.valor || 0).toLocaleString()}</td>
+ <td class="date-cell col-expiration">${escapeHtml(formatPrettyDate(c.expiracion))}</td>
+ <td class="col-state ${st.cls}">${st.t}</td>
+ <td class="actions-cell col-actions">
   <div class="actions-group">
 
   <button class="remind" type="button" onclick="openNotifyModal('${escapeHtml(c.id)}')">
