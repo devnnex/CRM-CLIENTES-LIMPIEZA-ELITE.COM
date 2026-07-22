@@ -1058,8 +1058,15 @@ function formatPrettyDate(value){
 }
 
 function getClientMonth(client){
- const sourceDate=client.contactoMes ? `${client.contactoMes}-01` : client.fecha;
- const date=new Date(sourceDate);
+ const contactoMes=String(client.contactoMes || "").trim();
+ const monthMatch=contactoMes.match(/^\d{4}-(\d{1,2})$/);
+
+ if(monthMatch){
+  const month=Number(monthMatch[1])-1;
+  return month>=0 && month<=11 ? month : null;
+ }
+
+ const date=new Date(client.fecha);
  return Number.isNaN(date.getTime()) ? null : date.getMonth();
 }
 
