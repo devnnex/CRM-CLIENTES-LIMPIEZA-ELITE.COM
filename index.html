@@ -844,7 +844,6 @@ footer{
 <button class="kpi active" type="button" data-kpi="total" onclick="setKpiFilter('total')"><span>Total</span><h2 id="kTotal">0</h2></button>
 <button class="kpi" type="button" data-kpi="soon" onclick="setKpiFilter('soon')"><span>Por vencer</span><h2 id="kSoon">0</h2></button>
 <button class="kpi" type="button" data-kpi="expired" onclick="setKpiFilter('expired')"><span>Vencidos</span><h2 id="kExpired">0</h2></button>
-<button class="kpi" type="button" data-kpi="recent" onclick="setKpiFilter('recent')"><span>7 días</span><h2 id="kRecent">0</h2></button>
 </section>
 
 <section class="filters">
@@ -1046,6 +1045,16 @@ function normalizeText(value=""){
 
 function formatMoney(value){
  return `$${Number(value || 0).toLocaleString()}`;
+}
+
+function formatPrettyDate(value){
+ const date=new Date(value);
+ if(Number.isNaN(date.getTime())) return "";
+
+ const dayNames=["Dom","Lun","Mar","Mie","Jue","Vie","Sab"];
+ const monthNames=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+ return `${dayNames[date.getDay()]} ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 function getClientMonth(client){
@@ -1496,16 +1505,15 @@ function setKpiFilter(type){
 
  if(activeKpiFilter==="soon") filterState.value="soon";
  if(activeKpiFilter==="expired") filterState.value="expired";
- if(activeKpiFilter==="recent" || activeKpiFilter==="total") filterState.value="";
+ if(activeKpiFilter==="total") filterState.value="";
 
  updateKpiActiveState();
  render();
 }
 
-function matchesKpiFilter(status,recent){
+function matchesKpiFilter(status){
  if(activeKpiFilter==="soon") return status.cls==="soon";
  if(activeKpiFilter==="expired") return status.cls==="expired";
- if(activeKpiFilter==="recent") return recent;
  return true;
 }
 
@@ -1547,12 +1555,13 @@ function renderSmartAlerts(){
  soonClients.slice(0,3).forEach(client=>{
   const days=daysDiff(client.expiracion);
   const dueText=days<=0 ? "vence hoy" : `vence en ${days} dia${days===1 ? "" : "s"}`;
+  const dueDate=formatPrettyDate(client.expiracion);
   cards.push(`<article class="smart-alert">
    <div class="smart-alert-header">
     <span class="smart-alert-icon"><i class="fa-brands fa-whatsapp"></i></span>
     <div>
      <p class="smart-alert-title">${escapeHtml(client.nombre || "Cliente sin nombre")}</p>
-     <p class="smart-alert-text">${escapeHtml(dueText)}. ${escapeHtml(client.servicio || "Servicio pendiente")} en ${escapeHtml(client.ciudad || "ciudad sin registrar")}.</p>
+     <p class="smart-alert-text">${escapeHtml(dueText)}${dueDate ? `, ${escapeHtml(dueDate)}` : ""}. ${escapeHtml(client.servicio || "Servicio pendiente")} en ${escapeHtml(client.ciudad || "ciudad sin registrar")}.</p>
     </div>
    </div>
    <div class="smart-alert-actions">
@@ -1615,7 +1624,7 @@ function render(){
   if(city && c.ciudad!==city) return;
   if(month!=="" && getClientMonth(c)!==Number(month)) return;
   if(stf && st.cls!==stf) return;
-  if(!matchesKpiFilter(st,isRecent)) return;
+  if(!matchesKpiFilter(st)) return;
 
   if(st.cls==="soon")soon++;
   if(st.cls==="expired")exp++;
@@ -1637,7 +1646,7 @@ rows.push(`
  <td>${escapeHtml(c.servicio)}</td>
  <td>${escapeHtml(c.frecuencia)} meses</td>
  <td>$${Number(c.valor || 0).toLocaleString()}</td>
- <td>${escapeHtml(String(c.expiracion || "").split("T")[0])}</td>
+ <td>${escapeHtml(formatPrettyDate(c.expiracion))}</td>
  <td class="${st.cls}">${st.t}</td>
  <td class="actions-cell">
   <div class="actions-group">
@@ -1658,7 +1667,6 @@ rows.push(`
  kTotal.textContent=data.length;
  kSoon.textContent=soon;
  kExpired.textContent=exp;
- kRecent.textContent=recent;
  updateKpiActiveState();
  renderSmartAlerts();
 }
