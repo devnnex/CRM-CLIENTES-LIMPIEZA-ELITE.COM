@@ -214,9 +214,32 @@ body{
  border:1px solid var(--border);
 }
 
-table{width:100%;border-collapse:collapse}
+table{
+ width:100%;
+ min-width:1080px;
+ border-collapse:collapse;
+}
 th,td{padding:16px;border-bottom:1px solid #ffffff15}
 th{opacity:.7;font-size:13px}
+
+.actions-head{
+ width:150px;
+ min-width:150px;
+}
+
+.actions-cell{
+ width:150px;
+ min-width:150px;
+ vertical-align:middle;
+ white-space:nowrap;
+}
+
+.actions-group{
+ display:inline-flex;
+ align-items:center;
+ justify-content:flex-start;
+ gap:8px;
+}
 
 tr:hover td{background:rgba(76,201,240,.08)}
 
@@ -235,6 +258,7 @@ tr.expired td{background:rgba(255,107,107,.12)}
  color:white;
  width:34px;
  height:34px;
+ flex:0 0 34px;
  display:inline-flex;
  align-items:center;
  justify-content:center;
@@ -574,7 +598,6 @@ tr.expired td{background:rgba(255,107,107,.12)}
  justify-content:center;
  border-radius:10px;
  cursor:pointer;
- margin-left:4px;
  transition:transform .16s ease,filter .16s ease;
  box-shadow:0 8px 22px rgba(0,0,0,.22);
 }
@@ -876,7 +899,7 @@ footer{
 <th>Valor</th>
 <th>Expiración</th>
 <th>Estado</th>
-<th>Acción</th>
+<th class="actions-head">Acción</th>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -1618,7 +1641,8 @@ rows.push(`
  <td>$${Number(c.valor || 0).toLocaleString()}</td>
  <td>${escapeHtml(String(c.expiracion || "").split("T")[0])}</td>
  <td class="${st.cls}">${st.t}</td>
- <td>
+ <td class="actions-cell">
+  <div class="actions-group">
 
   <button class="remind" type="button" onclick="openNotifyModal('${escapeHtml(c.id)}')">
   <i class="fa-brands fa-whatsapp"></i>
@@ -1627,6 +1651,7 @@ rows.push(`
    <button class="action-btn edit-btn" onclick="edit('${escapeHtml(c.id)}')"><i class="fa-solid fa-pen-to-square"></i></button>
    <button class="action-btn del-btn" onclick="remove('${escapeHtml(c.id)}')"><i class="fa-solid fa-trash-can"></i></button>
 
+  </div>
  </td>
 </tr>`);
  });
