@@ -45,12 +45,19 @@
 
 *{box-sizing:border-box}
 
+html{
+ width:100%;
+ overflow-x:hidden;
+}
+
 body{
  margin:0;
  background:var(--bg);
  color:var(--text);
  display:flex;
  min-height:100vh;
+ width:100%;
+ overflow-x:hidden;
 }
 
 /* =========================================================
@@ -89,6 +96,7 @@ body{
 ========================================================= */
 .main{
  flex:1;
+ min-width:0;
  padding:28px;
  display:flex;
  flex-direction:column;
@@ -222,8 +230,10 @@ body{
 .table-wrap{
  background:var(--glass);
  border-radius:var(--radius);
- overflow-x:auto;   /* importante */
+ overflow-x:auto;
+ max-width:100%;
  border:1px solid var(--border);
+ -webkit-overflow-scrolling:touch;
 }
 
 table{
@@ -759,14 +769,27 @@ footer{
 
  .sidebar{
   width:100%;
-  flex-direction:column;
-  justify-content:flex-start;
+  min-height:150px;
+  padding:22px 24px;
+  flex-direction:row;
+  justify-content:center;
+  align-items:center;
+  gap:20px;
   border-right:none;
   border-bottom:1px solid var(--border);
  }
 
+ .sidebar h2{
+  margin:0;
+  font-size:clamp(22px,6vw,34px);
+  line-height:1.08;
+  text-align:left;
+ }
+
  .logo{
-  max-width:110px;
+  width:96px;
+  max-width:28vw;
+  flex:0 0 auto;
  }
 
  .main{
@@ -800,6 +823,23 @@ footer{
 }
 
 @media (max-width:600px){
+
+ .sidebar{
+  min-height:190px;
+  padding:26px 20px 24px;
+  flex-direction:column;
+  gap:14px;
+ }
+
+ .sidebar h2{
+  text-align:center;
+  font-size:28px;
+ }
+
+ .logo{
+  width:116px;
+  max-width:46vw;
+ }
 
  #assistantModal{
   padding:16px;
