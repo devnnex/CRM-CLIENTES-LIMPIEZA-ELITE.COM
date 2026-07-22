@@ -231,6 +231,10 @@ th{opacity:.7;font-size:13px}
  white-space:nowrap;
 }
 
+.date-cell{
+ white-space:nowrap;
+}
+
 .actions-group{
  display:inline-flex;
  flex-direction:column;
@@ -580,10 +584,11 @@ tr.expired td{background:rgba(255,107,107,.12)}
  height:10px;
  border-radius:50%;
  margin-right:8px;
+ background:currentColor;
  box-shadow:0 0 10px currentColor,0 0 18px currentColor;
 }
 
-.dot-active{color:#39ff14}
+.dot-active{color:#00ff57}
 .dot-soon{color:#ffb703}
 .dot-expired{color:#ff006e}
 
@@ -1052,7 +1057,7 @@ function formatPrettyDate(value){
  if(Number.isNaN(date.getTime())) return "";
 
  const dayNames=["Dom","Lun","Mar","Mie","Jue","Vie","Sab"];
- const monthNames=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+ const monthNames=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sept","Oct","Nov","Dic"];
 
  return `${dayNames[date.getDay()]} ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
 }
@@ -1653,7 +1658,7 @@ rows.push(`
  <td>${escapeHtml(c.servicio)}</td>
  <td>${escapeHtml(c.frecuencia)} meses</td>
  <td>$${Number(c.valor || 0).toLocaleString()}</td>
- <td>${escapeHtml(formatPrettyDate(c.expiracion))}</td>
+ <td class="date-cell">${escapeHtml(formatPrettyDate(c.expiracion))}</td>
  <td class="${st.cls}">${st.t}</td>
  <td class="actions-cell">
   <div class="actions-group">
