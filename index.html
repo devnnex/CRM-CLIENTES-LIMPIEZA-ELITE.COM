@@ -1425,21 +1425,24 @@ footer{
  }
 
  .actions-cell{
+  align-items:stretch;
   padding-top:12px;
  }
 
  .actions-group{
   width:100%;
   flex-direction:row;
-  flex-wrap:nowrap;
-  justify-content:flex-end;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:center;
   gap:9px;
  }
 
  .action-state{
-  flex-basis:auto;
-  margin-right:auto;
-  align-self:center;
+  flex:0 0 100%;
+  margin:0 0 4px;
+  align-self:auto;
+  text-align:center;
   font-size:12px;
  }
 
