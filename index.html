@@ -1937,10 +1937,10 @@ footer{
 /* =========================================================
    CONFIG
 ========================================================= */
-const API="https://script.google.com/macros/s/AKfycbzn7Fl9Vbg9OHmu_l542W9-QUeMMJRXTdYBvMs14s5i43sYEGrLvrmx0sc0BwtuooRKUw/exec";
+const API="https://script.google.com/macros/s/AKfycbzshxSg9DXoxRUS0l_q3SSTEJrdVAZXrubr5qx9Qd0eQ3oEZuxxp71dVmRn1N6CUsD6/exec";
 const CACHE_KEY="limpiezaEliteClientesCache";
-const CONTACTED_KEY="limpiezaEliteContactedClients";
-const DISMISSED_ALERTS_KEY="limpiezaEliteDismissedAlerts";
+const LEGACY_CONTACTED_KEY="limpiezaEliteContactedClients";
+const LEGACY_DISMISSED_ALERTS_KEY="limpiezaEliteDismissedAlerts";
 let data=[];
 let editingId=null;
 let viewingClientId=null;
@@ -1949,8 +1949,11 @@ let notifyingClientId=null;
 let activeKpiFilter="total";
 let chatBootstrapped=false;
 let toastTimer=null;
-let contactedClients=readStoredObject(CONTACTED_KEY);
-let dismissedAlerts=readStoredObject(DISMISSED_ALERTS_KEY);
+let dismissedAlerts={};
+let clientSearchIndex=new Map();
+let loadPromise=null;
+let lastSuccessfulLoad=0;
+let legacyMigrationStarted=false;
 const assistantModalEl=document.getElementById("assistantModal");
 const clientModalEl=document.getElementById("clientModal");
 const chatLogEl=document.getElementById("chatLog");
@@ -1991,7 +1994,7 @@ function formatPrettyDate(value){
  return `${dayNames[date.getDay()]} ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
 }
 
-function readStoredObject(key){
+function readLegacyStoredObject(key){
  try{
   const stored=JSON.parse(localStorage.getItem(key) || "{}");
   return stored && typeof stored==="object" && !Array.isArray(stored) ? stored : {};
@@ -2000,10 +2003,8 @@ function readStoredObject(key){
  }
 }
 
-function writeStoredObject(key,value){
- try{
-  localStorage.setItem(key,JSON.stringify(value));
- }catch(error){}
+function normalizeBoolean(value){
+ return value===true || value===1 || ["true","1","si","sí","yes"].includes(String(value || "").toLowerCase());
 }
 
 function showToast(message){
@@ -2074,36 +2075,53 @@ function getReminderCycleKey(client){
 
 function isClientContacted(client){
  const cycleKey=getReminderCycleKey(client);
- if(contactedClients[cycleKey]) return true;
-
- const stableRecord=contactedClients[getClientContactKey(client)];
- if(stableRecord && (!stableRecord.cycle || stableRecord.cycle===cycleKey)) return true;
-
- const legacyPrefix=`${String(client.id)}::`;
- const normalizedCycle=cycleKey.slice(legacyPrefix.length);
- const legacyKey=Object.keys(contactedClients).find(key=>
-  key.startsWith(legacyPrefix) && normalizeReminderCycle(key.slice(legacyPrefix.length))===normalizedCycle
- );
-
- if(!legacyKey) return false;
-
- const migratedRecord={...contactedClients[legacyKey],cycle:cycleKey};
- contactedClients[cycleKey]=migratedRecord;
- contactedClients[getClientContactKey(client)]=migratedRecord;
- writeStoredObject(CONTACTED_KEY,contactedClients);
- return true;
+ if(!normalizeBoolean(client.mensajeEnviado)) return false;
+ return !client.mensajeCiclo || String(client.mensajeCiclo)===cycleKey;
 }
 
-function markClientContacted(client){
+function applyClientContacted(client,sentAt=new Date().toISOString()){
  const cycleKey=getReminderCycleKey(client);
- const record={
-  sentAt:new Date().toISOString(),
-  name:client.nombre || "",
-  cycle:cycleKey
- };
- contactedClients[cycleKey]=record;
- contactedClients[getClientContactKey(client)]=record;
- writeStoredObject(CONTACTED_KEY,contactedClients);
+ data=data.map(item=>item.id==client.id ? {
+  ...item,
+  mensajeEnviado:true,
+  mensajeEnviadoFecha:sentAt,
+  mensajeCiclo:cycleKey,
+  alertaOculta:false,
+  alertaOcultaFecha:"",
+  alertaCiclo:""
+ } : item);
+ persistCache();
+ render();
+}
+
+async function markClientContacted(client){
+ const previous={...client};
+ const sentAt=new Date().toISOString();
+ const cycleKey=getReminderCycleKey(client);
+
+ applyClientContacted(client,sentAt);
+
+ try{
+  const result=await postToApi({
+   action:"markContacted",
+   id:client.id,
+   mensajeCiclo:cycleKey
+  });
+
+  data=data.map(item=>item.id==client.id ? {
+   ...item,
+   mensajeEnviado:true,
+   mensajeEnviadoFecha:result.mensajeEnviadoFecha || sentAt,
+   mensajeCiclo:result.mensajeCiclo || cycleKey
+  } : item);
+  persistCache();
+  return true;
+ }catch(error){
+  data=data.map(item=>item.id==client.id ? previous : item);
+  persistCache();
+  render();
+  throw error;
+ }
 }
 
 function getClientAlertKey(client){
@@ -2114,10 +2132,38 @@ function getSummaryAlertKey(clients){
  return `summary::${clients.map(getReminderCycleKey).join("|")}`;
 }
 
+function isClientAlertDismissed(client){
+ if(!normalizeBoolean(client.alertaOculta)) return false;
+ return !client.alertaCiclo || String(client.alertaCiclo)===getReminderCycleKey(client);
+}
+
 function dismissAlert(key){
  dismissedAlerts[key]=Date.now();
- writeStoredObject(DISMISSED_ALERTS_KEY,dismissedAlerts);
  renderSmartAlerts();
+
+ const client=data.find(item=>getClientAlertKey(item)===key);
+ if(!client) return;
+
+ const previous={...client};
+ const alertaCiclo=getReminderCycleKey(client);
+ data=data.map(item=>item.id==client.id ? {
+  ...item,
+  alertaOculta:true,
+  alertaOcultaFecha:new Date().toISOString(),
+  alertaCiclo
+ } : item);
+ persistCache();
+
+ postToApi({action:"dismissAlert",id:client.id,alertaCiclo})
+  .then(()=>load(false,true))
+  .catch(error=>{
+   console.error("No se pudo guardar el cierre de la alerta",error);
+   data=data.map(item=>item.id==client.id ? previous : item);
+   delete dismissedAlerts[key];
+   persistCache();
+   render();
+   showToast("No se pudo guardar el cierre de la alerta.");
+  });
 }
 
 function toggleNotifications(){
@@ -2137,7 +2183,6 @@ function contactFromAlert(id){
  if(!client) return;
 
  dismissedAlerts[getClientAlertKey(client)]=Date.now();
- writeStoredObject(DISMISSED_ALERTS_KEY,dismissedAlerts);
  renderSmartAlerts();
  closeNotifications();
  openNotifyModal(id);
@@ -2162,7 +2207,28 @@ function buildExpirationDate(contactoMesValue,frequency){
  return base.toISOString();
 }
 
+function buildClientSearchText(client){
+ return normalizeText([
+  client.nombre,
+  client.telefono,
+  client.ciudad,
+  client.direccion,
+  client.servicio,
+  client.frecuencia,
+  client.valor,
+  client.contactoMes
+ ].filter(value=>value!==undefined && value!==null).join(" "));
+}
+
+function rebuildClientSearchIndex(){
+ clientSearchIndex=new Map(data.map(client=>[
+  String(client.id),
+  buildClientSearchText(client)
+ ]));
+}
+
 function persistCache(){
+ rebuildClientSearchIndex();
  try{
   localStorage.setItem(CACHE_KEY,JSON.stringify(data));
  }catch(error){}
@@ -2173,6 +2239,7 @@ function hydrateFromCache(){
   const cached=JSON.parse(localStorage.getItem(CACHE_KEY) || "[]");
   if(Array.isArray(cached) && cached.length){
    data=cached;
+   rebuildClientSearchIndex();
    buildCities();
    updateFooter();
    render();
@@ -2183,9 +2250,60 @@ function hydrateFromCache(){
  return false;
 }
 
+function legacyContactMatches(client,legacyContacts){
+ const cycleKey=getReminderCycleKey(client);
+ if(legacyContacts[cycleKey]) return true;
+
+ const stableRecord=legacyContacts[getClientContactKey(client)];
+ if(stableRecord && (!stableRecord.cycle || stableRecord.cycle===cycleKey)) return true;
+
+ const legacyPrefix=`${String(client.id)}::`;
+ const normalizedCycle=cycleKey.slice(legacyPrefix.length);
+ return Object.keys(legacyContacts).some(key=>
+  key.startsWith(legacyPrefix) && normalizeReminderCycle(key.slice(legacyPrefix.length))===normalizedCycle
+ );
+}
+
+async function migrateLegacyContactedClients(){
+ if(legacyMigrationStarted) return;
+ legacyMigrationStarted=true;
+
+ const legacyContacts=readLegacyStoredObject(LEGACY_CONTACTED_KEY);
+ const clientsToMigrate=data.filter(client=>
+  !isClientContacted(client) && legacyContactMatches(client,legacyContacts)
+ );
+
+ if(!clientsToMigrate.length){
+  try{
+   localStorage.removeItem(LEGACY_CONTACTED_KEY);
+   localStorage.removeItem(LEGACY_DISMISSED_ALERTS_KEY);
+  }catch(error){}
+  return;
+ }
+
+ const results=await Promise.allSettled(clientsToMigrate.map(client=>
+  postToApi({
+   action:"markContacted",
+   id:client.id,
+   mensajeCiclo:getReminderCycleKey(client)
+  })
+  .then(result=>{
+   applyClientContacted(client,result.mensajeEnviadoFecha);
+  })
+ ));
+
+ if(results.every(result=>result.status==="fulfilled")){
+  try{
+   localStorage.removeItem(LEGACY_CONTACTED_KEY);
+   localStorage.removeItem(LEGACY_DISMISSED_ALERTS_KEY);
+  }catch(error){}
+ }
+}
+
 async function postToApi(payload){
  const response=await fetch(API,{
   method:"POST",
+  cache:"no-store",
   body:JSON.stringify(payload)
  });
 
@@ -2198,7 +2316,7 @@ async function postToApi(payload){
   result={status:"ok"};
  }
 
- if(result.status==="not_found" || result.status==="error"){
+ if(result.status==="not_found" || result.status==="error" || result.status==="invalid_action"){
   throw new Error(result.status);
  }
 
@@ -2384,13 +2502,21 @@ async function saveClientDetails(){
  try{
   await postToApi(payload);
   const savedClient={...client,...payload};
+  if(getReminderCycleKey(client)!==getReminderCycleKey(savedClient)){
+   savedClient.mensajeEnviado=false;
+   savedClient.mensajeEnviadoFecha="";
+   savedClient.mensajeCiclo="";
+   savedClient.alertaOculta=false;
+   savedClient.alertaOcultaFecha="";
+   savedClient.alertaCiclo="";
+  }
   data=data.map(item=>item.id==client.id ? savedClient : item);
   persistCache();
   buildCities();
   render();
   closeClientDetails();
   showToast(`Información de ${savedClient.nombre} actualizada.`);
-  load(false);
+  load(false,true);
  }catch(error){
   console.error("No se pudo actualizar el cliente",error);
   clientDetailError.textContent="No se pudieron guardar los cambios. Intenta nuevamente.";
@@ -2410,7 +2536,7 @@ function closeAssistantModal(){
  assistantModalEl.style.display="none";
 }
 
-function sendWhatsAppNotification(){
+async function sendWhatsAppNotification(){
  const client=data.find(x=>x.id==notifyingClientId);
  if(!client) return;
 
@@ -2432,10 +2558,16 @@ function sendWhatsAppNotification(){
  whatsappLink.click();
  whatsappLink.remove();
 
- markClientContacted(client);
  closeNotifyModal();
- render();
+ const savePromise=markClientContacted(client);
  showToast(`Mensaje marcado como enviado a ${client.nombre}.`);
+
+ try{
+  await savePromise;
+ }catch(error){
+  console.error("No se pudo guardar el mensaje enviado",error);
+  showToast("WhatsApp se abrió, pero no se pudo guardar el estado. Intenta nuevamente.");
+ }
 }
 
 function appendChatMessage(role,text){
@@ -2741,7 +2873,9 @@ function getSmartAlertMessage(clients){
 
 function renderSmartAlerts(){
  const alertClients=getAlertClients();
- const visibleClients=alertClients.filter(client=>!dismissedAlerts[getClientAlertKey(client)]);
+ const visibleClients=alertClients.filter(client=>
+  !dismissedAlerts[getClientAlertKey(client)] && !isClientAlertDismissed(client)
+ );
  const count=visibleClients.length;
 
  notificationBadge.textContent=String(count);
@@ -2801,28 +2935,51 @@ function renderSmartAlerts(){
 /* =========================================================
    LOAD
 ========================================================= */
-async function load(showLoader=true){
+async function load(showLoader=true,force=false){
+ if(loadPromise) return loadPromise;
+ if(!force && lastSuccessfulLoad && Date.now()-lastSuccessfulLoad<1500) return data;
 
  if(showLoader && !data.length) loaderLoad.style.display="flex";
 
- try{
- const r=await fetch(`${API}?action=list&_=${Date.now()}`,{cache:"no-store"});
- const newData=await r.json();
+ loadPromise=(async()=>{
+  try{
+   const controller=new AbortController();
+   const timeout=setTimeout(()=>controller.abort(),15000);
+   let response;
 
- if(showLoader) loaderLoad.style.display="none";
+   try{
+    response=await fetch(`${API}?action=list`,{
+     cache:"no-store",
+     signal:controller.signal
+    });
+   }finally{
+    clearTimeout(timeout);
+   }
 
- // solo re-render si cambió la cantidad
- data=Array.isArray(newData) ? newData : [];
- persistCache();
- buildCities();
- updateFooter();
- render();
- }catch(error){
-  console.error("No se pudo cargar clientes",error);
- }finally{
-  loaderLoad.style.display="none";
- }
+   if(!response.ok) throw new Error(`HTTP ${response.status}`);
+   const newData=await response.json();
+   if(!Array.isArray(newData)) throw new Error("Respuesta de clientes invalida");
 
+   data=newData;
+   lastSuccessfulLoad=Date.now();
+   persistCache();
+   buildCities();
+   updateFooter();
+   render();
+   migrateLegacyContactedClients().catch(error=>{
+    console.error("No se pudieron migrar estados anteriores",error);
+   });
+   return data;
+  }catch(error){
+   console.error("No se pudo cargar clientes",error);
+   return data;
+  }finally{
+   loaderLoad.style.display="none";
+   loadPromise=null;
+  }
+ })();
+
+ return loadPromise;
 }
 
 
@@ -2851,9 +3008,7 @@ function render(){
   const st=statusInfo(c.expiracion);
   const contacted=isClientContacted(c);
 
-  const searchableText=normalizeText([
-   c.nombre,c.telefono,c.ciudad,c.direccion,c.servicio,c.frecuencia,c.valor,c.contactoMes
-  ].filter(value=>value!==undefined && value!==null).join(" "));
+  const searchableText=clientSearchIndex.get(String(c.id)) || buildClientSearchText(c);
 
   if(searchTerms.length && !searchTerms.every(term=>searchableText.includes(term))) return;
   if(city && normalizeText(c.ciudad)!==normalizeText(city)) return;
@@ -2957,7 +3112,20 @@ async function save(){
  };
 
  const result=await postToApi(payload);
- const savedClient={...payload,id:result.id || editingId || crypto.randomUUID()};
+ const savedClient={
+  ...(existingClient || {}),
+  ...payload,
+  id:result.id || editingId || crypto.randomUUID()
+ };
+
+ if(existingClient && getReminderCycleKey(existingClient)!==getReminderCycleKey(savedClient)){
+  savedClient.mensajeEnviado=false;
+  savedClient.mensajeEnviadoFecha="";
+  savedClient.mensajeCiclo="";
+  savedClient.alertaOculta=false;
+  savedClient.alertaOcultaFecha="";
+  savedClient.alertaCiclo="";
+ }
 
  if(editingId){
   data=data.map(client=>client.id==editingId ? savedClient : client);
@@ -2971,7 +3139,7 @@ async function save(){
 
  closeFormModal();
  editingId=null;
- load(false);
+ load(false,true);
  }catch(error){
   console.error("No se pudo guardar cliente",error);
   formError.textContent="No se pudo guardar el cliente. Intenta nuevamente.";
@@ -3013,7 +3181,7 @@ async function remove(id){
   persistCache();
   buildCities();
   render();
-  load(false);
+  load(false,true);
  }catch(error){
   console.error("No se pudo eliminar cliente",error);
   alert("No se pudo eliminar el cliente. Intenta nuevamente.");
@@ -3099,10 +3267,12 @@ filterCity.onchange=filterMonth.onchange=render;
 filterContact.onchange=render;
 filterState.onchange=handleStateFilterChange;
 
-window.addEventListener("storage",event=>{
- if(event.key!==CONTACTED_KEY) return;
- contactedClients=readStoredObject(CONTACTED_KEY);
- render();
+window.addEventListener("focus",()=>{
+ if(Date.now()-lastSuccessfulLoad>10000) load(false,true);
+});
+
+document.addEventListener("visibilitychange",()=>{
+ if(!document.hidden && Date.now()-lastSuccessfulLoad>10000) load(false,true);
 });
 
 /* =========================================================
@@ -3111,7 +3281,7 @@ window.addEventListener("storage",event=>{
 hydrateFromCache();
 load(!data.length);
 bootstrapAssistant();
-setInterval(()=>load(false),120000);
+setInterval(()=>load(false,true),60000);
 
 if("serviceWorker" in navigator){
  window.addEventListener("load",()=>{
