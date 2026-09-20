@@ -373,6 +373,30 @@ tr.expired td{background:rgba(255,107,107,.035)}
  min-width:0;
 }
 
+.client-name-stack{
+ display:flex;
+ flex-direction:column;
+ align-items:flex-start;
+ min-width:0;
+}
+
+.mobile-contact-state{
+ display:none;
+ align-items:center;
+ gap:6px;
+ color:#7df0a6;
+ font-size:11px;
+ font-weight:750;
+ line-height:1.2;
+}
+
+.mobile-contact-state .status-dot{
+ width:7px;
+ height:7px;
+ margin:0;
+ box-shadow:0 0 8px currentColor;
+}
+
 .client-avatar{
  position:relative;
  width:40px;
@@ -1240,8 +1264,57 @@ footer{
 
  .topbar-actions{flex-direction:column}
 
- .filters{grid-template-columns:1fr}
+ .filters{
+  grid-template-columns:1fr;
+  gap:10px;
+  padding:12px;
+  border-color:rgba(255,255,255,.13);
+  border-radius:22px;
+  background:
+   linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025)),
+   rgba(8,15,35,.88);
+  box-shadow:0 20px 55px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.06);
+ }
  .filter-field:first-child{grid-column:auto}
+
+ .filter-field{
+  gap:6px;
+  padding:10px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  background:rgba(3,10,27,.46);
+  transition:border-color .18s ease,background .18s ease,box-shadow .18s ease;
+ }
+
+ .filter-field:focus-within{
+  border-color:rgba(76,201,240,.48);
+  background:rgba(8,22,48,.72);
+  box-shadow:0 0 0 3px rgba(76,201,240,.09);
+ }
+
+ .filter-field label{
+  padding-left:3px;
+  color:rgba(233,240,255,.74);
+  font-size:11px;
+  letter-spacing:.075em;
+ }
+
+ .filters input,
+ .filters select{
+  min-height:48px;
+  padding:12px 14px;
+  border-color:rgba(255,255,255,.11);
+  border-radius:13px;
+  background:linear-gradient(180deg,rgba(8,22,50,.96),rgba(5,14,33,.96));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+ }
+
+ .filters input:focus,
+ .filters select:focus{
+  outline:none;
+  border-color:#4cc9f0;
+  box-shadow:0 0 0 3px rgba(76,201,240,.13),inset 0 1px 0 rgba(255,255,255,.05);
+ }
 
  #assistantModal{
   padding:16px;
@@ -1384,6 +1457,7 @@ footer{
   display:flex;
   flex-direction:column;
   align-items:flex-start;
+  max-width:100%;
   min-width:0;
   padding:8px;
   border:0;
@@ -1392,6 +1466,10 @@ footer{
   overflow:visible;
   text-overflow:clip;
   line-height:1.35;
+ }
+
+ tbody td[class]{
+  width:auto;
  }
 
  tbody td::before{
@@ -1424,13 +1502,30 @@ footer{
   white-space:normal;
  }
 
+ .mobile-contact-state{
+  display:inline-flex;
+ }
+
+ tbody .col-address,
+ tbody .col-service{
+  width:auto;
+  word-break:normal;
+  overflow-wrap:break-word;
+ }
+
  .actions-cell{
-  align-items:stretch;
+  align-items:center;
   padding-top:12px;
  }
 
- .actions-group{
+ .actions-cell::before{
   width:100%;
+  align-self:flex-start;
+ }
+
+ .actions-group{
+  width:min(100%,180px);
+  margin:0 auto;
   flex-direction:row;
   flex-wrap:wrap;
   justify-content:center;
@@ -1439,11 +1534,7 @@ footer{
  }
 
  .action-state{
-  flex:0 0 100%;
-  margin:0 0 4px;
-  align-self:auto;
-  text-align:center;
-  font-size:12px;
+  display:none;
  }
 
  .remind,.action-btn{
@@ -1955,19 +2046,63 @@ function buildContactoMes(monthValue,yearValue){
  return `${year}-${monthValue}`;
 }
 
+function normalizeReminderCycle(value){
+ const raw=String(value || "").trim();
+ if(!raw) return "sin-fecha";
+
+ const isoDate=raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+ if(isoDate) return `${isoDate[1]}-${isoDate[2]}-${isoDate[3]}`;
+
+ const parsed=new Date(raw);
+ if(!Number.isNaN(parsed.getTime())){
+  const year=parsed.getFullYear();
+  const month=String(parsed.getMonth()+1).padStart(2,"0");
+  const day=String(parsed.getDate()).padStart(2,"0");
+  return `${year}-${month}-${day}`;
+ }
+
+ return normalizeText(raw);
+}
+
+function getClientContactKey(client){
+ return `client::${String(client.id)}`;
+}
+
 function getReminderCycleKey(client){
- return `${String(client.id)}::${String(client.expiracion || client.contactoMes || "")}`;
+ return `${String(client.id)}::${normalizeReminderCycle(client.expiracion || client.contactoMes)}`;
 }
 
 function isClientContacted(client){
- return Boolean(contactedClients[getReminderCycleKey(client)]);
+ const cycleKey=getReminderCycleKey(client);
+ if(contactedClients[cycleKey]) return true;
+
+ const stableRecord=contactedClients[getClientContactKey(client)];
+ if(stableRecord && (!stableRecord.cycle || stableRecord.cycle===cycleKey)) return true;
+
+ const legacyPrefix=`${String(client.id)}::`;
+ const normalizedCycle=cycleKey.slice(legacyPrefix.length);
+ const legacyKey=Object.keys(contactedClients).find(key=>
+  key.startsWith(legacyPrefix) && normalizeReminderCycle(key.slice(legacyPrefix.length))===normalizedCycle
+ );
+
+ if(!legacyKey) return false;
+
+ const migratedRecord={...contactedClients[legacyKey],cycle:cycleKey};
+ contactedClients[cycleKey]=migratedRecord;
+ contactedClients[getClientContactKey(client)]=migratedRecord;
+ writeStoredObject(CONTACTED_KEY,contactedClients);
+ return true;
 }
 
 function markClientContacted(client){
- contactedClients[getReminderCycleKey(client)]={
+ const cycleKey=getReminderCycleKey(client);
+ const record={
   sentAt:new Date().toISOString(),
-  name:client.nombre || ""
+  name:client.nombre || "",
+  cycle:cycleKey
  };
+ contactedClients[cycleKey]=record;
+ contactedClients[getClientContactKey(client)]=record;
  writeStoredObject(CONTACTED_KEY,contactedClients);
 }
 
@@ -2289,12 +2424,13 @@ function sendWhatsAppNotification(){
   return;
  }
 
- const whatsappWindow=window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,"_blank");
- if(!whatsappWindow){
-  showToast("Permite las ventanas emergentes para abrir WhatsApp.");
-  return;
- }
- whatsappWindow.opener=null;
+ const whatsappLink=document.createElement("a");
+ whatsappLink.href=`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+ whatsappLink.target="_blank";
+ whatsappLink.rel="noopener noreferrer";
+ document.body.appendChild(whatsappLink);
+ whatsappLink.click();
+ whatsappLink.remove();
 
  markClientContacted(client);
  closeNotifyModal();
@@ -2700,28 +2836,32 @@ function render(){
  const month=filterMonth.value;
  const stf=filterState.value;
  const contactFilter=filterContact.value;
+ const searchTerms=q.split(/\s+/).filter(Boolean);
 
  const rows=[];
- let soon=0,exp=0,recent=0;
- const now=Date.now();
+ const statusTotals=data.reduce((totals,client)=>{
+  const status=statusInfo(client.expiracion).cls;
+  if(status==="soon") totals.soon++;
+  if(status==="expired") totals.expired++;
+  return totals;
+ },{soon:0,expired:0});
 
  data.forEach(c=>{
 
   const st=statusInfo(c.expiracion);
-  const isRecent=now-new Date(c.fecha)<7*86400000;
   const contacted=isClientContacted(c);
 
-  if(q && !normalizeText(Object.values(c).join(" ")).includes(q)) return;
-  if(city && c.ciudad!==city) return;
+  const searchableText=normalizeText([
+   c.nombre,c.telefono,c.ciudad,c.direccion,c.servicio,c.frecuencia,c.valor,c.contactoMes
+  ].filter(value=>value!==undefined && value!==null).join(" "));
+
+  if(searchTerms.length && !searchTerms.every(term=>searchableText.includes(term))) return;
+  if(city && normalizeText(c.ciudad)!==normalizeText(city)) return;
   if(month!=="" && getClientMonth(c)!==Number(month)) return;
   if(stf && st.cls!==stf) return;
   if(contactFilter==="sent" && !contacted) return;
   if(contactFilter==="pending" && contacted) return;
   if(!matchesKpiFilter(st)) return;
-
-  if(st.cls==="soon")soon++;
-  if(st.cls==="expired")exp++;
-  if(isRecent)recent++;
 
  let dotClass="dot-active";
 if(st.cls==="soon") dotClass="dot-soon";
@@ -2732,7 +2872,10 @@ rows.push(`
  <td class="col-name" data-label="Cliente">
    <div class="client-identity">
     <span class="client-avatar"><i class="fa-solid fa-user"></i><span class="status-dot ${dotClass}"></span></span>
-    <button class="client-name-button" type="button" data-client-id="${escapeHtml(c.id)}" onclick="openClientDetails(this.dataset.clientId)" aria-label="Ver información de ${escapeHtml(c.nombre)}">${escapeHtml(c.nombre)}</button>
+    <span class="client-name-stack">
+     <button class="client-name-button" type="button" data-client-id="${escapeHtml(c.id)}" onclick="openClientDetails(this.dataset.clientId)" aria-label="Ver información de ${escapeHtml(c.nombre)}">${escapeHtml(c.nombre)}</button>
+     ${contacted ? `<span class="mobile-contact-state"><span class="status-dot ${dotClass}"></span> Mensaje enviado</span>` : ''}
+    </span>
    </div>
  </td>
  <td class="col-phone" data-label="Teléfono">${escapeHtml(c.telefono)}</td>
@@ -2761,8 +2904,8 @@ rows.push(`
 
  tbody.innerHTML=rows.join("");
  kTotal.textContent=data.length;
- kSoon.textContent=soon;
- kExpired.textContent=exp;
+ kSoon.textContent=statusTotals.soon;
+ kExpired.textContent=statusTotals.expired;
  updateKpiActiveState();
  renderSmartAlerts();
 }
@@ -2955,6 +3098,12 @@ search.oninput=scheduleRender;
 filterCity.onchange=filterMonth.onchange=render;
 filterContact.onchange=render;
 filterState.onchange=handleStateFilterChange;
+
+window.addEventListener("storage",event=>{
+ if(event.key!==CONTACTED_KEY) return;
+ contactedClients=readStoredObject(CONTACTED_KEY);
+ render();
+});
 
 /* =========================================================
    INIT
