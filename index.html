@@ -407,6 +407,30 @@ tr.expired td{background:rgba(255,107,107,.035)}
  white-space:nowrap;
 }
 
+.client-name-button{
+ min-width:0;
+ padding:3px 0;
+ border:0;
+ background:transparent;
+ color:#f4f8ff;
+ cursor:pointer;
+ font:inherit;
+ font-weight:750;
+ overflow:hidden;
+ text-align:left;
+ text-overflow:ellipsis;
+ white-space:nowrap;
+ transition:color .12s ease,transform .12s ease;
+}
+
+.client-name-button:hover{
+ color:#8edfff;
+ text-decoration:underline;
+ text-underline-offset:4px;
+}
+
+.client-name-button:active{transform:scale(.98)}
+
 /* =========================================================
    MODAL
 ========================================================= */
@@ -448,6 +472,155 @@ tr.expired td{background:rgba(255,107,107,.035)}
 .modal-wide{
  width:min(760px,92vw);
 }
+
+.client-modal{
+ width:min(980px,94vw);
+ padding:0;
+ gap:0;
+ overflow:hidden;
+ border-radius:28px;
+}
+
+.client-detail-hero{
+ display:flex;
+ align-items:center;
+ gap:16px;
+ padding:24px 26px;
+ border-bottom:1px solid var(--border);
+ background:linear-gradient(135deg,rgba(76,201,240,.11),rgba(67,97,238,.07) 48%,rgba(255,154,31,.08));
+}
+
+.client-detail-hero .close-x{flex:0 0 38px}
+
+.client-detail-avatar{
+ width:62px;
+ height:62px;
+ flex:0 0 62px;
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ border:1px solid rgba(76,201,240,.3);
+ border-radius:20px;
+ background:linear-gradient(145deg,rgba(76,201,240,.2),rgba(67,97,238,.2));
+ color:#8edfff;
+ font-size:25px;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 12px 32px rgba(0,0,0,.24);
+}
+
+.client-detail-heading{
+ flex:1;
+ min-width:0;
+}
+
+.client-detail-eyebrow{
+ margin:0 0 4px;
+ color:rgba(233,240,255,.56);
+ font-size:12px;
+ font-weight:800;
+ letter-spacing:.08em;
+ text-transform:uppercase;
+}
+
+.client-detail-heading h3{
+ margin:0;
+ overflow:hidden;
+ color:#f4f8ff;
+ font-size:clamp(22px,3vw,30px);
+ letter-spacing:-.025em;
+ text-overflow:ellipsis;
+ white-space:nowrap;
+}
+
+.client-detail-meta{
+ display:flex;
+ flex-wrap:wrap;
+ gap:7px;
+ margin-top:10px;
+}
+
+.detail-chip{
+ display:inline-flex;
+ align-items:center;
+ gap:6px;
+ min-height:28px;
+ padding:0 10px;
+ border:1px solid rgba(255,255,255,.1);
+ border-radius:999px;
+ background:rgba(255,255,255,.055);
+ color:rgba(233,240,255,.78);
+ font-size:12px;
+ font-weight:700;
+}
+
+.detail-chip.sent{
+ border-color:rgba(37,211,102,.28);
+ color:#7df0a6;
+}
+
+.client-detail-body{
+ min-height:0;
+ padding:24px 26px 26px;
+ overflow-y:auto;
+}
+
+.client-detail-grid{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:14px;
+}
+
+.client-detail-field{
+ display:flex;
+ flex-direction:column;
+ gap:7px;
+ min-width:0;
+}
+
+.client-detail-field.span-2{grid-column:span 2}
+
+.client-detail-field label{
+ display:flex;
+ align-items:center;
+ gap:7px;
+ color:rgba(233,240,255,.65);
+ font-size:12px;
+ font-weight:800;
+ letter-spacing:.035em;
+ text-transform:uppercase;
+}
+
+.client-detail-field label i{
+ width:15px;
+ color:#6fd7fa;
+ text-align:center;
+}
+
+.client-detail-field input,
+.client-detail-field select{
+ width:100%;
+ min-height:48px;
+ padding:12px 13px;
+ border:1px solid rgba(255,255,255,.14);
+ border-radius:13px;
+ background:rgba(0,0,0,.22);
+ color:#f4f8ff;
+}
+
+.client-detail-field input:hover,
+.client-detail-field select:hover{
+ border-color:rgba(76,201,240,.34);
+}
+
+.client-detail-footer{
+ display:flex;
+ justify-content:flex-end;
+ gap:10px;
+ margin-top:22px;
+ padding-top:18px;
+ border-top:1px solid rgba(255,255,255,.09);
+}
+
+.client-detail-footer .btn{min-width:150px}
 
 .assistant-modal{
  width:min(920px,90vw);
@@ -774,9 +947,46 @@ tr.expired td{background:rgba(255,107,107,.035)}
  width:min(360px,calc(100vw - 32px));
  display:flex;
  flex-direction:column;
- gap:12px;
+ max-height:calc(100dvh - 124px);
  z-index:80;
  pointer-events:none;
+}
+
+.notification-panel-header{display:none}
+
+.smart-alert-list{
+ display:flex;
+ flex-direction:column;
+ gap:12px;
+ max-height:inherit;
+ overflow-y:auto;
+ overscroll-behavior:contain;
+ pointer-events:auto;
+ scrollbar-width:thin;
+ scrollbar-color:rgba(76,201,240,.35) transparent;
+}
+
+.notification-toggle{
+ display:none;
+}
+
+.notification-badge{
+ position:absolute;
+ top:-6px;
+ right:-6px;
+ min-width:23px;
+ height:23px;
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ padding:0 6px;
+ border:2px solid #07101f;
+ border-radius:999px;
+ background:#ff4d6d;
+ color:white;
+ font-size:11px;
+ font-weight:900;
+ line-height:1;
 }
 
 .smart-alert{
@@ -789,6 +999,32 @@ tr.expired td{background:rgba(255,107,107,.035)}
  animation:slideAlert .28s ease both;
  position:relative;
  padding-right:46px;
+}
+
+.smart-alert.expired-alert{
+ border-color:rgba(255,107,107,.36);
+ box-shadow:0 18px 60px rgba(0,0,0,.42),0 0 24px rgba(255,107,107,.07);
+}
+
+.smart-alert.expired-alert .smart-alert-icon{
+ background:rgba(255,107,107,.14);
+ color:#ff8f8f;
+}
+
+.notification-empty{
+ display:none;
+ padding:24px 18px;
+ border:1px solid rgba(255,255,255,.1);
+ border-radius:18px;
+ color:rgba(233,240,255,.7);
+ text-align:center;
+}
+
+.notification-empty i{
+ display:block;
+ margin-bottom:9px;
+ color:#7df0a6;
+ font-size:24px;
 }
 
 .smart-alert-close{
@@ -983,9 +1219,13 @@ footer{
   bottom:16px;
   width:calc(100vw - 32px);
   max-height:42vh;
-  overflow:auto;
  }
 
+}
+
+@media (max-width:820px){
+ .client-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .client-detail-field.span-2{grid-column:span 2}
 }
 
 @media (max-width:600px){
@@ -1053,6 +1293,32 @@ footer{
   border-radius:24px;
  }
 
+ .client-modal{
+  width:100%;
+  padding:0;
+  border-radius:24px 24px 0 0;
+ }
+
+ .client-detail-hero{
+  align-items:flex-start;
+  padding:18px;
+ }
+
+ .client-detail-avatar{
+  width:50px;
+  height:50px;
+  flex-basis:50px;
+  border-radius:16px;
+  font-size:20px;
+ }
+
+ .client-detail-heading h3{font-size:22px}
+ .client-detail-body{padding:18px}
+ .client-detail-grid{grid-template-columns:1fr}
+ .client-detail-field.span-2{grid-column:auto}
+ .client-detail-footer{flex-direction:column-reverse}
+ .client-detail-footer .btn{width:100%}
+
  .modal-box input,
  .modal-box select,
  .modal-box textarea,
@@ -1097,12 +1363,15 @@ footer{
  tbody tr{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
+  height:auto;
+  min-height:0;
   gap:2px 10px;
   padding:12px;
   border:1px solid var(--border);
   border-radius:20px;
   background:var(--glass);
   box-shadow:0 16px 44px rgba(0,0,0,.28);
+  overflow:hidden;
  }
 
  tbody tr.soon{background:rgba(255,209,102,.10)}
@@ -1150,6 +1419,11 @@ footer{
 
  tbody .col-name::before{display:block}
 
+ .client-name-button{
+  max-width:100%;
+  white-space:normal;
+ }
+
  .actions-cell{
   padding-top:12px;
  }
@@ -1176,9 +1450,96 @@ footer{
   border-radius:13px;
  }
 
- .smart-alerts{
-  max-height:50dvh;
+ .notification-toggle{
+  position:fixed;
+  right:16px;
+  bottom:16px;
+  z-index:92;
+  width:56px;
+  height:56px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(76,201,240,.4);
+  border-radius:18px;
+  background:linear-gradient(135deg,#4cc9f0,#4361ee);
+  color:white;
+  cursor:pointer;
+  font-size:20px;
+  box-shadow:0 16px 42px rgba(67,97,238,.38);
  }
+
+ .smart-alerts{
+  top:72px;
+  right:10px;
+  bottom:10px;
+  width:calc(100vw - 20px);
+  max-height:none;
+  padding:14px;
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:24px;
+  background:rgba(7,12,28,.97);
+  backdrop-filter:blur(22px);
+  box-shadow:0 28px 90px rgba(0,0,0,.62);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transform:translateY(18px) scale(.98);
+  transition:opacity .18s ease,transform .18s ease,visibility .18s ease;
+ }
+
+ .smart-alerts.open{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  transform:translateY(0) scale(1);
+ }
+
+ .notification-panel-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:2px 2px 12px;
+ }
+
+ .notification-panel-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+ }
+
+ .notification-panel-title i{color:#ffd166}
+
+ .notification-panel-title strong{
+  display:block;
+  font-size:17px;
+ }
+
+ .notification-panel-title span{
+  display:block;
+  margin-top:2px;
+  color:rgba(233,240,255,.58);
+  font-size:12px;
+ }
+
+ .notification-panel-header .close-x{
+  flex:0 0 38px;
+ }
+
+ .smart-alert-list{
+  flex:1;
+  min-height:0;
+  max-height:none;
+  padding:0 2px 2px;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+ }
+
+ .smart-alert{flex:0 0 auto}
+
+ .notification-empty{display:block}
 
  .toast{
   bottom:14px;
@@ -1358,6 +1719,75 @@ footer{
 </div>
 </div>
 
+<div class="modal" id="clientModal">
+<div class="modal-box client-modal" role="dialog" aria-modal="true" aria-labelledby="clientDetailTitle">
+<div class="client-detail-hero">
+<div class="client-detail-avatar"><i class="fa-solid fa-user"></i></div>
+<div class="client-detail-heading">
+<p class="client-detail-eyebrow">Ficha del cliente</p>
+<h3 id="clientDetailTitle">Cliente</h3>
+<div class="client-detail-meta">
+<span id="clientDetailStatus" class="detail-chip"></span>
+<span id="clientDetailExpiration" class="detail-chip"></span>
+<span id="clientDetailMessage" class="detail-chip"></span>
+<span id="clientDetailRegistered" class="detail-chip"></span>
+</div>
+</div>
+<button class="close-x" type="button" onclick="closeClientDetails()" aria-label="Cerrar ficha">×</button>
+</div>
+<div class="client-detail-body">
+<div class="client-detail-grid">
+<div class="client-detail-field span-2">
+<label for="dNombre"><i class="fa-solid fa-user"></i> Nombre</label>
+<input id="dNombre" autocomplete="name">
+</div>
+<div class="client-detail-field">
+<label for="dTelefono"><i class="fa-solid fa-phone"></i> Teléfono</label>
+<input id="dTelefono" type="tel" inputmode="tel" autocomplete="tel">
+</div>
+<div class="client-detail-field">
+<label for="dCiudad"><i class="fa-solid fa-location-dot"></i> Ciudad</label>
+<input id="dCiudad" autocomplete="address-level2">
+</div>
+<div class="client-detail-field span-2">
+<label for="dDireccion"><i class="fa-solid fa-map-location-dot"></i> Dirección</label>
+<input id="dDireccion" autocomplete="street-address">
+</div>
+<div class="client-detail-field span-2">
+<label for="dServicio"><i class="fa-solid fa-broom"></i> Servicio</label>
+<input id="dServicio">
+</div>
+<div class="client-detail-field">
+<label for="dFrecuencia"><i class="fa-solid fa-rotate"></i> Frecuencia en meses</label>
+<input id="dFrecuencia" type="number" min="1" inputmode="numeric">
+</div>
+<div class="client-detail-field">
+<label for="dValor"><i class="fa-solid fa-dollar-sign"></i> Valor</label>
+<input id="dValor" type="number" min="0" inputmode="numeric">
+</div>
+<div class="client-detail-field">
+<label for="dContactoMes"><i class="fa-solid fa-calendar-days"></i> Mes de contacto</label>
+<select id="dContactoMes">
+<option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option>
+<option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option>
+<option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option>
+<option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+</select>
+</div>
+<div class="client-detail-field">
+<label for="dContactoAnio"><i class="fa-solid fa-calendar-check"></i> Año</label>
+<input id="dContactoAnio" type="number" min="2000" max="2100" inputmode="numeric">
+</div>
+</div>
+<div id="clientDetailError" class="form-error"></div>
+<div class="client-detail-footer">
+<button class="btn btn-secondary" type="button" onclick="closeClientDetails()">Cerrar</button>
+<button class="btn" type="button" onclick="saveClientDetails()"><i class="fa-solid fa-check"></i> Guardar cambios</button>
+</div>
+</div>
+</div>
+</div>
+
 <div class="modal" id="assistantModal">
 <div class="modal-box assistant-modal">
 <div class="modal-header">
@@ -1396,7 +1826,16 @@ footer{
 <div id="loaderLoad" class="loader"><div class="spinner"></div></div>
 <div id="loaderSave" class="loader"><div class="spinner"></div></div>
 <div id="loaderDelete" class="loader"><div class="spinner"></div></div>
-<aside id="smartAlerts" class="smart-alerts" aria-live="polite"></aside>
+<button id="notificationToggle" class="notification-toggle" type="button" onclick="toggleNotifications()" aria-label="Abrir notificaciones" aria-controls="smartAlerts" aria-expanded="false">
+<i class="fa-solid fa-bell"></i><span id="notificationBadge" class="notification-badge">0</span>
+</button>
+<aside id="smartAlerts" class="smart-alerts" aria-live="polite" aria-label="Notificaciones de clientes">
+<div class="notification-panel-header">
+<div class="notification-panel-title"><i class="fa-solid fa-bell"></i><div><strong>Notificaciones</strong><span id="notificationPanelCount">Sin avisos pendientes</span></div></div>
+<button class="close-x" type="button" onclick="closeNotifications()" aria-label="Cerrar notificaciones">×</button>
+</div>
+<div id="smartAlertList" class="smart-alert-list"></div>
+</aside>
 <div id="appToast" class="toast" role="status" aria-live="polite"><i class="fa-solid fa-circle-check"></i><span id="appToastText"></span></div>
 
 <script>
@@ -1410,6 +1849,7 @@ const CONTACTED_KEY="limpiezaEliteContactedClients";
 const DISMISSED_ALERTS_KEY="limpiezaEliteDismissedAlerts";
 let data=[];
 let editingId=null;
+let viewingClientId=null;
 let lastCount=0;
 let notifyingClientId=null;
 let activeKpiFilter="total";
@@ -1418,6 +1858,7 @@ let toastTimer=null;
 let contactedClients=readStoredObject(CONTACTED_KEY);
 let dismissedAlerts=readStoredObject(DISMISSED_ALERTS_KEY);
 const assistantModalEl=document.getElementById("assistantModal");
+const clientModalEl=document.getElementById("clientModal");
 const chatLogEl=document.getElementById("chatLog");
 const chatInputEl=document.getElementById("chatInput");
 
@@ -1541,6 +1982,18 @@ function dismissAlert(key){
  renderSmartAlerts();
 }
 
+function toggleNotifications(){
+ const isOpen=smartAlerts.classList.toggle("open");
+ notificationToggle.setAttribute("aria-expanded",String(isOpen));
+ notificationToggle.setAttribute("aria-label",isOpen ? "Cerrar notificaciones" : "Abrir notificaciones");
+}
+
+function closeNotifications(){
+ smartAlerts.classList.remove("open");
+ notificationToggle.setAttribute("aria-expanded","false");
+ notificationToggle.setAttribute("aria-label","Abrir notificaciones");
+}
+
 function contactFromAlert(id){
  const client=data.find(x=>x.id==id);
  if(!client) return;
@@ -1548,11 +2001,13 @@ function contactFromAlert(id){
  dismissedAlerts[getClientAlertKey(client)]=Date.now();
  writeStoredObject(DISMISSED_ALERTS_KEY,dismissedAlerts);
  renderSmartAlerts();
+ closeNotifications();
  openNotifyModal(id);
 }
 
 function viewSoonFromAlert(key){
  dismissAlert(key);
+ closeNotifications();
  setKpiFilter("soon");
 }
 
@@ -1698,6 +2153,113 @@ function openNotifyModal(id){
 function closeNotifyModal(){
  notifyModal.style.display="none";
  notifyingClientId=null;
+}
+
+function clearClientDetailErrors(){
+ clientDetailError.style.display="none";
+ clientDetailError.textContent="";
+ [dNombre,dTelefono,dCiudad,dDireccion,dServicio,dFrecuencia,dValor,dContactoMes,dContactoAnio]
+  .forEach(field=>field.classList.remove("input-error"));
+}
+
+function updateClientDetailMeta(client){
+ const status=statusInfo(client.expiracion);
+ const contacted=isClientContacted(client);
+ const registered=formatPrettyDate(client.fecha);
+
+ clientDetailTitle.textContent=client.nombre || "Cliente";
+ clientDetailStatus.className=`detail-chip ${status.cls}`;
+ clientDetailStatus.innerHTML=`<i class="fa-solid fa-circle"></i> ${escapeHtml(status.t)}`;
+ clientDetailExpiration.innerHTML=`<i class="fa-solid fa-calendar-day"></i> ${escapeHtml(formatPrettyDate(client.expiracion) || "Sin vencimiento")}`;
+ clientDetailMessage.className=`detail-chip${contacted ? " sent" : ""}`;
+ clientDetailMessage.innerHTML=contacted
+  ? '<i class="fa-solid fa-circle-check"></i> Mensaje enviado'
+  : '<i class="fa-regular fa-clock"></i> Pendiente de contactar';
+ clientDetailRegistered.innerHTML=`<i class="fa-solid fa-clock-rotate-left"></i> ${escapeHtml(registered ? `Registrado ${registered}` : "Fecha sin registrar")}`;
+}
+
+function openClientDetails(id){
+ const client=data.find(x=>x.id==id);
+ if(!client) return;
+
+ viewingClientId=client.id;
+ clearClientDetailErrors();
+ updateClientDetailMeta(client);
+ dNombre.value=client.nombre || "";
+ dTelefono.value=client.telefono || "";
+ dCiudad.value=client.ciudad || "";
+ dDireccion.value=client.direccion || "";
+ dServicio.value=client.servicio || "";
+ dFrecuencia.value=client.frecuencia || "";
+ dValor.value=client.valor || "";
+ dContactoMes.value=getMonthValueFromClient(client) || String(new Date().getMonth()+1).padStart(2,"0");
+ dContactoAnio.value=getYearValueFromClient(client);
+ clientModalEl.style.display="flex";
+}
+
+function closeClientDetails(){
+ clientModalEl.style.display="none";
+ viewingClientId=null;
+ clearClientDetailErrors();
+}
+
+async function saveClientDetails(){
+ const client=data.find(x=>x.id==viewingClientId);
+ if(!client) return;
+
+ const required=[dNombre,dTelefono,dCiudad,dDireccion,dServicio,dFrecuencia,dValor,dContactoMes,dContactoAnio];
+ const empty=required.filter(field=>!String(field.value || "").trim());
+ clearClientDetailErrors();
+
+ if(empty.length){
+  empty.forEach(field=>field.classList.add("input-error"));
+  clientDetailError.textContent="Completa los campos marcados antes de guardar.";
+  clientDetailError.style.display="block";
+  return;
+ }
+
+ const contactoMes=buildContactoMes(dContactoMes.value,dContactoAnio.value);
+ if(!contactoMes){
+  dContactoAnio.classList.add("input-error");
+  clientDetailError.textContent="Ingresa un año válido entre 2000 y 2100.";
+  clientDetailError.style.display="block";
+  return;
+ }
+
+ const payload={
+  action:"update",
+  id:client.id,
+  nombre:dNombre.value.trim(),
+  telefono:dTelefono.value.trim(),
+  ciudad:dCiudad.value.trim(),
+  direccion:dDireccion.value.trim(),
+  servicio:dServicio.value.trim(),
+  frecuencia:dFrecuencia.value,
+  valor:dValor.value,
+  fecha:client.fecha || new Date().toISOString(),
+  contactoMes,
+  expiracion:buildExpirationDate(contactoMes,dFrecuencia.value)
+ };
+
+ loaderSave.style.display="flex";
+
+ try{
+  await postToApi(payload);
+  const savedClient={...client,...payload};
+  data=data.map(item=>item.id==client.id ? savedClient : item);
+  persistCache();
+  buildCities();
+  render();
+  closeClientDetails();
+  showToast(`Información de ${savedClient.nombre} actualizada.`);
+  load(false);
+ }catch(error){
+  console.error("No se pudo actualizar el cliente",error);
+  clientDetailError.textContent="No se pudieron guardar los cambios. Intenta nuevamente.";
+  clientDetailError.style.display="block";
+ }finally{
+  loaderSave.style.display="none";
+ }
 }
 
 function openAssistantModal(){
@@ -2018,22 +2580,41 @@ function getSoonClients(){
   .sort((a,b)=>new Date(a.expiracion)-new Date(b.expiracion));
 }
 
-function getSmartAlertMessage(count){
- if(count===1) return "Hay 1 cliente por vencer. Conviene contactarlo hoy para asegurar la recompra.";
- if(count<=3) return `Hay ${count} clientes por vencer. Prioriza el contacto antes de que se enfrien.`;
- return `Hay ${count} clientes por vencer. Activa seguimiento por WhatsApp y agenda los casos mas urgentes.`;
+function getAlertClients(){
+ return data
+  .filter(client=>{
+   const status=statusInfo(client.expiracion).cls;
+   return (status==="soon" || status==="expired") && !isClientContacted(client);
+  })
+  .sort((a,b)=>new Date(a.expiracion)-new Date(b.expiracion));
+}
+
+function getSmartAlertMessage(clients){
+ const soonCount=clients.filter(client=>statusInfo(client.expiracion).cls==="soon").length;
+ const expiredCount=clients.filter(client=>statusInfo(client.expiracion).cls==="expired").length;
+
+ if(soonCount && expiredCount) return `Hay ${soonCount} cliente${soonCount===1 ? "" : "s"} por vencer y ${expiredCount} vencido${expiredCount===1 ? "" : "s"}. Prioriza los casos mas urgentes.`;
+ if(expiredCount) return `Hay ${expiredCount} cliente${expiredCount===1 ? "" : "s"} vencido${expiredCount===1 ? "" : "s"}. Conviene retomar el contacto hoy.`;
+ if(soonCount===1) return "Hay 1 cliente por vencer. Conviene contactarlo hoy para asegurar la recompra.";
+ if(soonCount<=3) return `Hay ${soonCount} clientes por vencer. Prioriza el contacto antes de que se enfrien.`;
+ return `Hay ${soonCount} clientes por vencer. Activa seguimiento por WhatsApp y agenda los casos mas urgentes.`;
 }
 
 function renderSmartAlerts(){
- const soonClients=getSoonClients().filter(client=>!isClientContacted(client));
+ const alertClients=getAlertClients();
+ const visibleClients=alertClients.filter(client=>!dismissedAlerts[getClientAlertKey(client)]);
+ const count=visibleClients.length;
 
- if(!soonClients.length){
-  smartAlerts.innerHTML="";
+ notificationBadge.textContent=String(count);
+ notificationPanelCount.textContent=count===1 ? "1 aviso pendiente" : `${count} avisos pendientes`;
+
+ if(!count){
+  smartAlertList.innerHTML='<div class="notification-empty"><i class="fa-solid fa-circle-check"></i>No hay avisos pendientes.</div>';
   return;
  }
 
  const cards=[];
- const summaryKey=getSummaryAlertKey(soonClients);
+ const summaryKey=getSummaryAlertKey(alertClients);
 
  if(!dismissedAlerts[summaryKey]){
   cards.push(`<article class="smart-alert">
@@ -2042,7 +2623,7 @@ function renderSmartAlerts(){
     <span class="smart-alert-icon"><i class="fa-solid fa-bell"></i></span>
     <div>
      <p class="smart-alert-title">Seguimiento recomendado</p>
-     <p class="smart-alert-text">${escapeHtml(getSmartAlertMessage(soonClients.length))}</p>
+     <p class="smart-alert-text">${escapeHtml(getSmartAlertMessage(visibleClients))}</p>
     </div>
    </div>
    <div class="smart-alert-actions">
@@ -2051,12 +2632,16 @@ function renderSmartAlerts(){
   </article>`);
  }
 
- soonClients.filter(client=>!dismissedAlerts[getClientAlertKey(client)]).slice(0,3).forEach(client=>{
+ visibleClients.forEach(client=>{
   const alertKey=getClientAlertKey(client);
   const days=daysDiff(client.expiracion);
-  const dueText=days<=0 ? "vence hoy" : `vence en ${days} dia${days===1 ? "" : "s"}`;
+  const status=statusInfo(client.expiracion);
+  const overdueDays=Math.abs(days);
+  const dueText=status.cls==="expired"
+   ? (days===0 ? "vence hoy" : `vencio hace ${overdueDays} dia${overdueDays===1 ? "" : "s"}`)
+   : `vence en ${days} dia${days===1 ? "" : "s"}`;
   const dueDate=formatPrettyDate(client.expiracion);
-  cards.push(`<article class="smart-alert">
+  cards.push(`<article class="smart-alert${status.cls==="expired" ? " expired-alert" : ""}">
    <button class="smart-alert-close" type="button" data-alert-key="${escapeHtml(alertKey)}" onclick="dismissAlert(this.dataset.alertKey)" aria-label="Ocultar alerta de ${escapeHtml(client.nombre || "cliente")}">×</button>
    <div class="smart-alert-header">
     <span class="smart-alert-icon"><i class="fa-brands fa-whatsapp"></i></span>
@@ -2071,7 +2656,7 @@ function renderSmartAlerts(){
   </article>`);
  });
 
- smartAlerts.innerHTML=cards.join("");
+ smartAlertList.innerHTML=cards.join("");
 }
 
 /* =========================================================
@@ -2144,7 +2729,7 @@ rows.push(`
  <td class="col-name" data-label="Cliente">
    <div class="client-identity">
     <span class="client-avatar"><i class="fa-solid fa-user"></i><span class="status-dot ${dotClass}"></span></span>
-    <span class="client-name-text">${escapeHtml(c.nombre)}</span>
+    <button class="client-name-button" type="button" data-client-id="${escapeHtml(c.id)}" onclick="openClientDetails(this.dataset.clientId)" aria-label="Ver información de ${escapeHtml(c.nombre)}">${escapeHtml(c.nombre)}</button>
    </div>
  </td>
  <td class="col-phone" data-label="Teléfono">${escapeHtml(c.telefono)}</td>
@@ -2319,19 +2904,30 @@ function closeFormModal(){
 
 modal.onclick=e=>e.target===modal&&closeFormModal();
 notifyModal.onclick=e=>e.target===notifyModal&&closeNotifyModal();
+clientModalEl.onclick=e=>e.target===clientModalEl&&closeClientDetails();
 assistantModalEl.onclick=e=>e.target===assistantModalEl&&closeAssistantModal();
 notifyType.onchange=updateNotifyPreview;
 document.addEventListener("keydown",event=>{
  if(event.key!=="Escape") return;
  if(notifyModal.style.display==="flex") closeNotifyModal();
+ else if(clientModalEl.style.display==="flex") closeClientDetails();
  else if(modal.style.display==="flex") closeFormModal();
  else if(assistantModalEl.style.display==="flex") closeAssistantModal();
+ else if(smartAlerts.classList.contains("open")) closeNotifications();
 });
 [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes,mContactoAnio].forEach(input=>{
  input.oninput=()=>{
   input.classList.remove("input-error");
   const hasErrors=[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes,mContactoAnio].some(field=>field.classList.contains("input-error"));
   if(!hasErrors) formError.style.display="none";
+ };
+});
+[dNombre,dTelefono,dCiudad,dDireccion,dServicio,dFrecuencia,dValor,dContactoMes,dContactoAnio].forEach(input=>{
+ input.oninput=()=>{
+  input.classList.remove("input-error");
+  if(![dNombre,dTelefono,dCiudad,dDireccion,dServicio,dFrecuencia,dValor,dContactoMes,dContactoAnio].some(field=>field.classList.contains("input-error"))){
+   clientDetailError.style.display="none";
+  }
  };
 });
 
