@@ -9,18 +9,20 @@
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 
-<!-- 🧩 Favicon clásico -->
-  <link rel="icon" type="image/png" href="./images/favicon.png">
+ <!-- 🧩 Favicon clásico -->
+  <link rel="icon" type="image/png" sizes="64x64" href="./images/favicon.png">
 
   <!-- 📱 Ícono de app (iOS / Android) -->
-  <link rel="apple-touch-icon" href="./images/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./images/icon-192.png">
+  <meta name="application-name" content="Limpieza Elite">
 
   <!-- 🧭 Configuración PWA -->
   <meta name="theme-color" content="#000000">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Admin Limpieza Elite">
+  <meta name="apple-mobile-web-app-title" content="Limpieza Elite">
 
   <!-- 📜 Manifest -->
   <link rel="manifest" href="./manifest.json">
@@ -81,8 +83,8 @@ body{
    ENCABEZADO
 ========================================================= */
 .topbar-logo{
- width:68px;
- height:68px;
+ width:82px;
+ height:82px;
  object-fit:contain;
  border-radius:18px;
  box-shadow:0 14px 38px rgba(0,0,0,.42),0 0 24px rgba(76,201,240,.10);
@@ -989,8 +991,8 @@ footer{
 @media (max-width:600px){
 
  .topbar-logo{
-  width:56px;
-  height:56px;
+  width:64px;
+  height:64px;
   border-radius:15px;
  }
 
@@ -1210,7 +1212,7 @@ footer{
 
 <div class="topbar">
 <h1>CRM de Servicios</h1>
-<img src="images/logo.png" class="topbar-logo" alt="Limpieza Elite">
+<img src="images/logo-hd.png" class="topbar-logo" alt="Limpieza Elite" width="82" height="82">
 <div class="topbar-actions">
 <button class="btn btn-elite" type="button" onclick="openAssistantModal()">Asistente Elite</button>
 <button class="btn" onclick="openModal()">+ Nuevo Cliente</button>
@@ -2362,6 +2364,14 @@ hydrateFromCache();
 load(!data.length);
 bootstrapAssistant();
 setInterval(()=>load(false),120000);
+
+if("serviceWorker" in navigator){
+ window.addEventListener("load",()=>{
+  navigator.serviceWorker.register("./service-worker.js").catch(error=>{
+   console.error("No se pudo registrar la aplicación instalable",error);
+  });
+ });
+}
 
 
 </script>
