@@ -40,10 +40,27 @@
  --radius:20px;
  --text:#e9f0ff;
  --shadow:0 20px 60px rgba(0,0,0,.5);
- font-family: Inter,system-ui;
+ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;
+ color-scheme:dark;
 }
 
 *{box-sizing:border-box}
+
+button,input,select,textarea{font:inherit}
+
+button,
+[role="button"]{
+ touch-action:manipulation;
+ -webkit-tap-highlight-color:transparent;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible{
+ outline:2px solid var(--accent);
+ outline-offset:2px;
+}
 
 html{
  width:100%;
@@ -109,6 +126,11 @@ body{
  align-items:center;
 }
 
+.topbar h1{
+ margin:0;
+ letter-spacing:-.035em;
+}
+
 .topbar-actions{
  display:flex;
  gap:12px;
@@ -124,7 +146,11 @@ body{
  font-weight:600;
  cursor:pointer;
  box-shadow:0 0 24px rgba(76,201,240,.4);
+ transition:transform .12s ease,filter .12s ease,box-shadow .12s ease;
 }
+
+.btn:hover{filter:brightness(1.05)}
+.btn:active{transform:scale(.975)}
 
 .btn-elite{
  background:linear-gradient(135deg,#ff9a1f,#ff5a00);
@@ -152,7 +178,7 @@ body{
  border:1px solid var(--border);
  box-shadow:var(--shadow);
  cursor:pointer;
- transition:transform .18s ease,border-color .18s ease,background .18s ease;
+ transition:transform .12s ease,border-color .12s ease,background .12s ease,box-shadow .12s ease;
  position:relative;
  overflow:hidden;
  text-align:left;
@@ -171,6 +197,8 @@ body{
  border-color:rgba(76,201,240,.72);
  box-shadow:0 18px 55px rgba(76,201,240,.18);
 }
+
+.kpi:active{transform:scale(.985)}
 
 .kpi span{opacity:.7;font-size:13px}
 .kpi h2{margin:6px 0 0;font-size:28px}
@@ -210,6 +238,7 @@ body{
  border:1px solid var(--border);
  background:#0005;
  color:white;
+ min-height:46px;
 }
 
 .filters select,
@@ -319,6 +348,23 @@ tr.expired td{background:rgba(255,107,107,.12)}
  filter:brightness(1.08);
 }
 
+.remind:active,.action-btn:active{transform:scale(.93)}
+
+.remind.sent{
+ background:rgba(37,211,102,.14);
+ border:1px solid rgba(37,211,102,.42);
+ color:#7df0a6;
+ box-shadow:none;
+}
+
+.action-state{
+ color:#7df0a6;
+ font-size:11px;
+ font-weight:700;
+ line-height:1.15;
+ white-space:normal;
+}
+
 /* =========================================================
    MODAL
 ========================================================= */
@@ -330,6 +376,8 @@ tr.expired td{background:rgba(255,107,107,.12)}
  backdrop-filter:blur(8px);
  align-items:center;
  justify-content:center;
+ padding:20px;
+ z-index:120;
 }
 
 #assistantModal{
@@ -341,14 +389,18 @@ tr.expired td{background:rgba(255,107,107,.12)}
 }
 
 .modal-box{
- background:#0d122b;
+ background:rgba(13,18,43,.98);
  padding:30px;
  border-radius:20px;
  display:flex;
  flex-direction:column;
  gap:12px;
  width:340px;
- box-shadow:var(--shadow);
+ max-width:100%;
+ max-height:calc(100dvh - 40px);
+ overflow-y:auto;
+ border:1px solid var(--border);
+ box-shadow:0 28px 90px rgba(0,0,0,.62);
 }
 
 .modal-wide{
@@ -464,7 +516,11 @@ tr.expired td{background:rgba(255,107,107,.12)}
  cursor:pointer;
  font-size:20px;
  line-height:1;
+ transition:transform .12s ease,background .12s ease;
 }
+
+.close-x:hover{background:rgba(255,255,255,.08)}
+.close-x:active{transform:scale(.92)}
 
 .modal-box input{
  padding:12px;
@@ -472,6 +528,7 @@ tr.expired td{background:rgba(255,107,107,.12)}
  border:1px solid var(--border);
  background:#0005;
  color:white;
+ min-height:46px;
 }
 
 .modal-box select,
@@ -482,6 +539,12 @@ tr.expired td{background:rgba(255,107,107,.12)}
  background:#0005;
  color:white;
  font:inherit;
+}
+
+.contact-period-grid{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) minmax(120px,.72fr);
+ gap:10px;
 }
 
 .modal-box textarea{
@@ -682,7 +745,31 @@ tr.expired td{background:rgba(255,107,107,.12)}
  padding:16px;
  box-shadow:0 18px 60px rgba(0,0,0,.42),0 0 26px rgba(255,209,102,.08);
  animation:slideAlert .28s ease both;
+ position:relative;
+ padding-right:46px;
 }
+
+.smart-alert-close{
+ position:absolute;
+ top:10px;
+ right:10px;
+ width:30px;
+ height:30px;
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ border:1px solid rgba(255,255,255,.12);
+ border-radius:50%;
+ background:rgba(255,255,255,.06);
+ color:rgba(233,240,255,.78);
+ cursor:pointer;
+ font-size:18px;
+ line-height:1;
+ transition:transform .12s ease,background .12s ease;
+}
+
+.smart-alert-close:hover{background:rgba(255,255,255,.12)}
+.smart-alert-close:active{transform:scale(.9)}
 
 .smart-alert-header{
  display:flex;
@@ -736,7 +823,11 @@ tr.expired td{background:rgba(255,107,107,.12)}
  font-weight:700;
  background:linear-gradient(135deg,#25d366,#128c7e);
  box-shadow:0 8px 22px rgba(37,211,102,.24);
+ transition:transform .12s ease,filter .12s ease;
 }
+
+.smart-alert-btn:hover{filter:brightness(1.06)}
+.smart-alert-btn:active{transform:scale(.97)}
 
 .smart-alert-btn.secondary{
  background:rgba(255,255,255,.08);
@@ -748,6 +839,34 @@ tr.expired td{background:rgba(255,107,107,.12)}
  from{opacity:0;transform:translateX(18px)}
  to{opacity:1;transform:translateX(0)}
 }
+
+.toast{
+ position:fixed;
+ left:50%;
+ bottom:24px;
+ z-index:1100;
+ display:flex;
+ align-items:center;
+ gap:10px;
+ max-width:calc(100vw - 32px);
+ padding:13px 17px;
+ border:1px solid rgba(37,211,102,.36);
+ border-radius:16px;
+ background:rgba(7,18,30,.96);
+ color:#f4f8ff;
+ box-shadow:0 20px 60px rgba(0,0,0,.48);
+ opacity:0;
+ pointer-events:none;
+ transform:translate(-50%,14px);
+ transition:opacity .18s ease,transform .18s ease;
+}
+
+.toast.show{
+ opacity:1;
+ transform:translate(-50%,0);
+}
+
+.toast i{color:#7df0a6}
 
 /* =========================================================
    LOADERS
@@ -896,6 +1015,168 @@ footer{
   width:100%;
  }
 
+ .main{
+  padding:16px;
+  gap:18px;
+ }
+
+ .modal{
+  align-items:flex-end;
+  padding:10px;
+ }
+
+ .modal-box,
+ .modal-wide{
+  width:100%;
+  max-height:calc(100dvh - 20px);
+  padding:20px;
+  border-radius:24px;
+ }
+
+ .modal-box input,
+ .modal-box select,
+ .modal-box textarea,
+ .filters input,
+ .filters select,
+ .chat-form input{
+  font-size:16px;
+ }
+
+ .contact-period-grid{
+  grid-template-columns:1fr 1fr;
+ }
+
+ .table-wrap{
+  border:none;
+  background:transparent;
+  overflow:visible;
+ }
+
+ table{
+  table-layout:auto;
+ }
+
+ thead{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+ }
+
+ tbody{
+  display:grid;
+  gap:12px;
+ }
+
+ tbody tr{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:2px 10px;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:20px;
+  background:var(--glass);
+  box-shadow:0 16px 44px rgba(0,0,0,.28);
+ }
+
+ tbody tr.soon{background:rgba(255,209,102,.10)}
+ tbody tr.expired{background:rgba(255,107,107,.10)}
+
+ tbody td,
+ tbody tr:hover td,
+ tbody tr.soon td,
+ tbody tr.expired td{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  min-width:0;
+  padding:8px;
+  border:0;
+  background:transparent;
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  line-height:1.35;
+ }
+
+ tbody td::before{
+  content:attr(data-label);
+  margin-bottom:4px;
+  color:rgba(233,240,255,.56);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+ }
+
+ tbody .col-name,
+ tbody .col-address,
+ tbody .col-service,
+ tbody .col-actions{
+  grid-column:1 / -1;
+ }
+
+ tbody .col-name{
+  display:block;
+  font-size:16px;
+  font-weight:800;
+ }
+
+ tbody .col-name::before{display:block}
+
+ .actions-cell{
+  padding-top:12px;
+ }
+
+ .actions-group{
+  width:100%;
+  flex-direction:row;
+  justify-content:flex-end;
+  gap:9px;
+ }
+
+ .action-state{
+  margin-right:auto;
+  align-self:center;
+  font-size:12px;
+ }
+
+ .remind,.action-btn{
+  width:42px;
+  height:42px;
+  flex-basis:42px;
+  border-radius:13px;
+ }
+
+ .smart-alerts{
+  max-height:50dvh;
+ }
+
+ .toast{
+  bottom:14px;
+  width:max-content;
+ }
+
+}
+
+@media (max-width:380px){
+ .contact-period-grid{grid-template-columns:1fr}
+ tbody tr{grid-template-columns:1fr}
+ tbody td{grid-column:1 / -1}
+}
+
+@media (prefers-reduced-motion:reduce){
+ *,*::before,*::after{
+  scroll-behavior:auto !important;
+  animation-duration:.01ms !important;
+  animation-iteration-count:1 !important;
+  transition-duration:.01ms !important;
+ }
 }
 
 
@@ -906,7 +1187,7 @@ footer{
 
 <aside class="sidebar">
 <h2>Limpieza Elite</h2>
-<img src="images/logo.png" class="logo">
+<img src="images/logo.png" class="logo" alt="Limpieza Elite">
 </aside>
 
 
@@ -1001,6 +1282,7 @@ footer{
 <input id="mServicio" placeholder="Servicio">
 <input id="mFrecuencia" type="number" placeholder="Frecuencia meses">
 <input id="mValor" type="number" placeholder="Valor">
+<div class="contact-period-grid">
 <div class="modal-field">
 <label for="mContactoMes">Mes de contacto</label>
 <select id="mContactoMes">
@@ -1018,6 +1300,11 @@ footer{
 <option value="11">Noviembre</option>
 <option value="12">Diciembre</option>
 </select>
+</div>
+<div class="modal-field">
+<label for="mContactoAnio">Año</label>
+<input id="mContactoAnio" type="number" inputmode="numeric" min="2000" max="2100" step="1" placeholder="Año">
+</div>
 </div>
 <div id="formError" class="form-error">Completa todos los campos antes de guardar.</div>
 <button class="btn" onclick="save()">Guardar</button>
@@ -1084,6 +1371,7 @@ footer{
 <div id="loaderSave" class="loader"><div class="spinner"></div></div>
 <div id="loaderDelete" class="loader"><div class="spinner"></div></div>
 <aside id="smartAlerts" class="smart-alerts" aria-live="polite"></aside>
+<div id="appToast" class="toast" role="status" aria-live="polite"><i class="fa-solid fa-circle-check"></i><span id="appToastText"></span></div>
 
 <script>
 
@@ -1092,12 +1380,17 @@ footer{
 ========================================================= */
 const API="https://script.google.com/macros/s/AKfycbzn7Fl9Vbg9OHmu_l542W9-QUeMMJRXTdYBvMs14s5i43sYEGrLvrmx0sc0BwtuooRKUw/exec";
 const CACHE_KEY="limpiezaEliteClientesCache";
+const CONTACTED_KEY="limpiezaEliteContactedClients";
+const DISMISSED_ALERTS_KEY="limpiezaEliteDismissedAlerts";
 let data=[];
 let editingId=null;
 let lastCount=0;
 let notifyingClientId=null;
 let activeKpiFilter="total";
 let chatBootstrapped=false;
+let toastTimer=null;
+let contactedClients=readStoredObject(CONTACTED_KEY);
+let dismissedAlerts=readStoredObject(DISMISSED_ALERTS_KEY);
 const assistantModalEl=document.getElementById("assistantModal");
 const chatLogEl=document.getElementById("chatLog");
 const chatInputEl=document.getElementById("chatInput");
@@ -1137,6 +1430,28 @@ function formatPrettyDate(value){
  return `${dayNames[date.getDay()]} ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
 }
 
+function readStoredObject(key){
+ try{
+  const stored=JSON.parse(localStorage.getItem(key) || "{}");
+  return stored && typeof stored==="object" && !Array.isArray(stored) ? stored : {};
+ }catch(error){
+  return {};
+ }
+}
+
+function writeStoredObject(key,value){
+ try{
+  localStorage.setItem(key,JSON.stringify(value));
+ }catch(error){}
+}
+
+function showToast(message){
+ appToastText.textContent=message;
+ appToast.classList.add("show");
+ clearTimeout(toastTimer);
+ toastTimer=setTimeout(()=>appToast.classList.remove("show"),2600);
+}
+
 function getClientMonth(client){
  const contactoMes=String(client.contactoMes || "").trim();
  const monthMatch=contactoMes.match(/^\d{4}-(\d{1,2})$/);
@@ -1155,9 +1470,49 @@ function getMonthValueFromClient(client){
  return month===null ? "" : String(month+1).padStart(2,"0");
 }
 
-function buildContactoMes(monthValue,baseContactoMes=""){
- const year=String(baseContactoMes || "").split("-")[0] || new Date().getFullYear();
- return monthValue ? `${year}-${monthValue}` : "";
+function getYearValueFromClient(client){
+ const contactoMes=String(client.contactoMes || "").trim();
+ const yearMatch=contactoMes.match(/^(\d{4})-\d{1,2}$/);
+ if(yearMatch) return yearMatch[1];
+
+ const date=new Date(client.fecha);
+ return Number.isNaN(date.getTime()) ? String(new Date().getFullYear()) : String(date.getFullYear());
+}
+
+function buildContactoMes(monthValue,yearValue){
+ const year=Number(yearValue);
+ if(!monthValue || !Number.isInteger(year) || year<2000 || year>2100) return "";
+ return `${year}-${monthValue}`;
+}
+
+function getReminderCycleKey(client){
+ return `${String(client.id)}::${String(client.expiracion || client.contactoMes || "")}`;
+}
+
+function isClientContacted(client){
+ return Boolean(contactedClients[getReminderCycleKey(client)]);
+}
+
+function markClientContacted(client){
+ contactedClients[getReminderCycleKey(client)]={
+  sentAt:new Date().toISOString(),
+  name:client.nombre || ""
+ };
+ writeStoredObject(CONTACTED_KEY,contactedClients);
+}
+
+function getClientAlertKey(client){
+ return `client::${getReminderCycleKey(client)}`;
+}
+
+function getSummaryAlertKey(clients){
+ return `summary::${clients.map(getReminderCycleKey).join("|")}`;
+}
+
+function dismissAlert(key){
+ dismissedAlerts[key]=Date.now();
+ writeStoredObject(DISMISSED_ALERTS_KEY,dismissedAlerts);
+ renderSmartAlerts();
 }
 
 function buildExpirationDate(contactoMesValue,frequency){
@@ -1323,10 +1678,22 @@ function sendWhatsAppNotification(){
 
  if(phone.length===10) phone=`57${phone}`;
 
- if(!phone || !msg) return;
+ if(!phone || !msg){
+  showToast("Revisa el teléfono y el mensaje antes de enviar.");
+  return;
+ }
 
- window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,"_blank");
+ const whatsappWindow=window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,"_blank");
+ if(!whatsappWindow){
+  showToast("Permite las ventanas emergentes para abrir WhatsApp.");
+  return;
+ }
+ whatsappWindow.opener=null;
+
+ markClientContacted(client);
  closeNotifyModal();
+ render();
+ showToast(`Mensaje marcado como enviado a ${client.nombre}.`);
 }
 
 function appendChatMessage(role,text){
@@ -1617,15 +1984,19 @@ function getSmartAlertMessage(count){
 }
 
 function renderSmartAlerts(){
- const soonClients=getSoonClients();
+ const soonClients=getSoonClients().filter(client=>!isClientContacted(client));
 
  if(!soonClients.length){
   smartAlerts.innerHTML="";
   return;
  }
 
- const cards=[
-  `<article class="smart-alert">
+ const cards=[];
+ const summaryKey=getSummaryAlertKey(soonClients);
+
+ if(!dismissedAlerts[summaryKey]){
+  cards.push(`<article class="smart-alert">
+   <button class="smart-alert-close" type="button" data-alert-key="${escapeHtml(summaryKey)}" onclick="dismissAlert(this.dataset.alertKey)" aria-label="Ocultar alerta">×</button>
    <div class="smart-alert-header">
     <span class="smart-alert-icon"><i class="fa-solid fa-bell"></i></span>
     <div>
@@ -1636,14 +2007,16 @@ function renderSmartAlerts(){
    <div class="smart-alert-actions">
     <button class="smart-alert-btn secondary" type="button" onclick="setKpiFilter('soon')"><i class="fa-solid fa-filter"></i> Ver por vencer</button>
    </div>
-  </article>`
- ];
+  </article>`);
+ }
 
- soonClients.slice(0,3).forEach(client=>{
+ soonClients.filter(client=>!dismissedAlerts[getClientAlertKey(client)]).slice(0,3).forEach(client=>{
+  const alertKey=getClientAlertKey(client);
   const days=daysDiff(client.expiracion);
   const dueText=days<=0 ? "vence hoy" : `vence en ${days} dia${days===1 ? "" : "s"}`;
   const dueDate=formatPrettyDate(client.expiracion);
   cards.push(`<article class="smart-alert">
+   <button class="smart-alert-close" type="button" data-alert-key="${escapeHtml(alertKey)}" onclick="dismissAlert(this.dataset.alertKey)" aria-label="Ocultar alerta de ${escapeHtml(client.nombre || "cliente")}">×</button>
    <div class="smart-alert-header">
     <span class="smart-alert-icon"><i class="fa-brands fa-whatsapp"></i></span>
     <div>
@@ -1652,7 +2025,7 @@ function renderSmartAlerts(){
     </div>
    </div>
    <div class="smart-alert-actions">
-    <button class="smart-alert-btn" type="button" onclick="openNotifyModal('${escapeHtml(client.id)}')"><i class="fa-brands fa-whatsapp"></i> Contactar</button>
+    <button class="smart-alert-btn" type="button" data-client-id="${escapeHtml(client.id)}" onclick="openNotifyModal(this.dataset.clientId)"><i class="fa-brands fa-whatsapp"></i> Contactar</button>
    </div>
   </article>`);
  });
@@ -1717,33 +2090,35 @@ function render(){
   if(st.cls==="expired")exp++;
   if(isRecent)recent++;
 
-  let dotClass="dot-active";
+ let dotClass="dot-active";
 if(st.cls==="soon") dotClass="dot-soon";
 if(st.cls==="expired") dotClass="dot-expired";
+const contacted=isClientContacted(c);
 
 rows.push(`
 <tr class="${st.cls}">
- <td class="col-name">
+ <td class="col-name" data-label="Cliente">
    <span class="status-dot ${dotClass}"></span>
    ${escapeHtml(c.nombre)}
  </td>
- <td class="col-phone">${escapeHtml(c.telefono)}</td>
- <td class="col-city">${escapeHtml(c.ciudad)}</td>
- <td class="col-address">${escapeHtml(c.direccion || "")}</td>
- <td class="col-service">${escapeHtml(c.servicio)}</td>
- <td class="col-frequency">${escapeHtml(c.frecuencia)} meses</td>
- <td class="col-value">$${Number(c.valor || 0).toLocaleString()}</td>
- <td class="date-cell col-expiration">${escapeHtml(formatPrettyDate(c.expiracion))}</td>
- <td class="col-state ${st.cls}">${st.t}</td>
- <td class="actions-cell col-actions">
+ <td class="col-phone" data-label="Teléfono">${escapeHtml(c.telefono)}</td>
+ <td class="col-city" data-label="Ciudad">${escapeHtml(c.ciudad)}</td>
+ <td class="col-address" data-label="Dirección">${escapeHtml(c.direccion || "")}</td>
+ <td class="col-service" data-label="Servicio">${escapeHtml(c.servicio)}</td>
+ <td class="col-frequency" data-label="Frecuencia">${escapeHtml(c.frecuencia)} meses</td>
+ <td class="col-value" data-label="Valor">$${Number(c.valor || 0).toLocaleString()}</td>
+ <td class="date-cell col-expiration" data-label="Expiración">${escapeHtml(formatPrettyDate(c.expiracion))}</td>
+ <td class="col-state ${st.cls}" data-label="Estado">${st.t}</td>
+ <td class="actions-cell col-actions" data-label="Acciones">
   <div class="actions-group">
 
-  <button class="remind" type="button" onclick="openNotifyModal('${escapeHtml(c.id)}')">
-  <i class="fa-brands fa-whatsapp"></i>
+  ${contacted ? '<span class="action-state"><i class="fa-solid fa-circle-check"></i> Mensaje enviado</span>' : ''}
+  <button class="remind${contacted ? " sent" : ""}" type="button" data-client-id="${escapeHtml(c.id)}" onclick="openNotifyModal(this.dataset.clientId)" aria-label="${contacted ? "Volver a enviar mensaje por WhatsApp" : "Enviar mensaje por WhatsApp"}" title="${contacted ? "Mensaje enviado · volver a enviar" : "Enviar por WhatsApp"}">
+  <i class="${contacted ? "fa-solid fa-check" : "fa-brands fa-whatsapp"}"></i>
   </button>
 
-   <button class="action-btn edit-btn" onclick="edit('${escapeHtml(c.id)}')"><i class="fa-solid fa-pen-to-square"></i></button>
-   <button class="action-btn del-btn" onclick="remove('${escapeHtml(c.id)}')"><i class="fa-solid fa-trash-can"></i></button>
+   <button class="action-btn edit-btn" type="button" data-client-id="${escapeHtml(c.id)}" onclick="edit(this.dataset.clientId)" aria-label="Editar cliente" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+   <button class="action-btn del-btn" type="button" data-client-id="${escapeHtml(c.id)}" onclick="remove(this.dataset.clientId)" aria-label="Eliminar cliente" title="Eliminar"><i class="fa-solid fa-trash-can"></i></button>
 
   </div>
  </td>
@@ -1762,7 +2137,7 @@ rows.push(`
    SAVE / CREATE / UPDATE & DELETE
 ========================================================= */
 async function save(){
- const requiredFields=[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes];
+ const requiredFields=[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes,mContactoAnio];
  const emptyFields=requiredFields.filter(input=>!String(input.value || "").trim());
 
  requiredFields.forEach(input=>input.classList.remove("input-error"));
@@ -1775,12 +2150,19 @@ async function save(){
   return;
  }
 
+ const contactoMes=buildContactoMes(mContactoMes.value,mContactoAnio.value);
+ if(!contactoMes){
+  mContactoAnio.classList.add("input-error");
+  formError.textContent="Ingresa un año válido entre 2000 y 2100.";
+  formError.style.display="block";
+  return;
+ }
+
  loaderSave.style.display="flex";
 
  try{
  const now=new Date();
  const existingClient=editingId ? data.find(x=>x.id==editingId) : null;
- const contactoMes=buildContactoMes(mContactoMes.value,existingClient?.contactoMes);
 
  const payload={
  action: editingId?"update":"create",
@@ -1829,7 +2211,7 @@ function edit(id){
  editingId=id;
  formError.textContent="Completa todos los campos antes de guardar.";
  formError.style.display="none";
- [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes].forEach(input=>input.classList.remove("input-error"));
+ [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes,mContactoAnio].forEach(input=>input.classList.remove("input-error"));
  mNombre.value=c.nombre;
  mTelefono.value=c.telefono;
  mCiudad.value=c.ciudad;
@@ -1838,6 +2220,7 @@ function edit(id){
  mFrecuencia.value=c.frecuencia;
  mValor.value=c.valor;
  mContactoMes.value=getMonthValueFromClient(c);
+ mContactoAnio.value=getYearValueFromClient(c);
  modal.style.display="flex";
 }
 
@@ -1870,11 +2253,13 @@ function openModal(){
  editingId=null;
  formError.textContent="Completa todos los campos antes de guardar.";
  formError.style.display="none";
- [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes].forEach(input=>{
+ [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes,mContactoAnio].forEach(input=>{
   input.value="";
   input.classList.remove("input-error");
  });
- mContactoMes.value=String(new Date().getMonth()+1).padStart(2,"0");
+ const now=new Date();
+ mContactoMes.value=String(now.getMonth()+1).padStart(2,"0");
+ mContactoAnio.value=String(now.getFullYear());
  modal.style.display="flex";
 }
 
@@ -1883,17 +2268,23 @@ function closeFormModal(){
  editingId=null;
  formError.textContent="Completa todos los campos antes de guardar.";
  formError.style.display="none";
- [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes].forEach(input=>input.classList.remove("input-error"));
+ [mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes,mContactoAnio].forEach(input=>input.classList.remove("input-error"));
 }
 
 modal.onclick=e=>e.target===modal&&closeFormModal();
 notifyModal.onclick=e=>e.target===notifyModal&&closeNotifyModal();
 assistantModalEl.onclick=e=>e.target===assistantModalEl&&closeAssistantModal();
 notifyType.onchange=updateNotifyPreview;
-[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes].forEach(input=>{
+document.addEventListener("keydown",event=>{
+ if(event.key!=="Escape") return;
+ if(notifyModal.style.display==="flex") closeNotifyModal();
+ else if(modal.style.display==="flex") closeFormModal();
+ else if(assistantModalEl.style.display==="flex") closeAssistantModal();
+});
+[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes,mContactoAnio].forEach(input=>{
  input.oninput=()=>{
   input.classList.remove("input-error");
-  const hasErrors=[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes].some(field=>field.classList.contains("input-error"));
+  const hasErrors=[mNombre,mTelefono,mCiudad,mDireccion,mServicio,mFrecuencia,mValor,mContactoMes,mContactoAnio].some(field=>field.classList.contains("input-error"));
   if(!hasErrors) formError.style.display="none";
  };
 });
@@ -1909,7 +2300,14 @@ function handleStateFilterChange(){
 /* =========================================================
    EVENTS
 ========================================================= */
-search.oninput=filterCity.onchange=filterMonth.onchange=render;
+let renderFrame=null;
+function scheduleRender(){
+ cancelAnimationFrame(renderFrame);
+ renderFrame=requestAnimationFrame(render);
+}
+
+search.oninput=scheduleRender;
+filterCity.onchange=filterMonth.onchange=render;
 filterState.onchange=handleStateFilterChange;
 
 /* =========================================================
